@@ -1,0 +1,2 @@
+A template for listeners to log every time a doctor dismisses them.
+• Columns: [Date] | [Symptom Reported] | [Doctor Response] | [AI Data Provided].
