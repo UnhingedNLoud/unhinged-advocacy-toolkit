@@ -1,0 +1,78 @@
+:root {
+  --neon-pink: #FF2D95;
+  --neon-purple: #A855F7;
+  --neon-blue: #00E5FF;
+  --neon-green: #39FF14;
+  --dark-bg: #000000;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  
+  /* The Master Gradient */
+  --ombre-grad: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
+}
+
+body {
+  background-color: var(--dark-bg);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* --- Typography --- */
+.text-gradient {
+  background: var(--ombre-grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.glow-pink { text-shadow: 0 0 15px rgba(255, 45, 149, 0.6); }
+
+/* --- Components --- */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gradient Border Effect */
+.gradient-border {
+  position: relative;
+  border-radius: 16px;
+  background: var(--dark-bg);
+  padding: 1px; /* The border thickness */
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 16px;
+  padding: 2px; 
+  background: var(--ombre-grad);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+  filter: blur(1px); /* Softens the glow */
+}
+
+/* --- Buttons --- */
+.btn-ombre {
+  background: var(--ombre-grad);
+  color: #000;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+.btn-ombre:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(0, 229, 255, 0.6);
+}
