@@ -1,4 +1,274 @@
-// Inside your updateChart() function, set these colors:
-borderColor: '#00E5FF', // Neon Blue for the line
-backgroundColor: 'rgba(0, 229, 255, 0.1)', // Soft Blue fill
-pointBackgroundColor: '#FF2D95', // Neon Pink points for focus
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LAB | Lab Trend Visualizer™</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #FF2D95;
+            --neon-purple: #A855F7;
+            --neon-blue: #00E5FF;
+            --neon-green: #39FF14;
+            --dark-bg: #000000;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --ombre-grad: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
+        }
+
+        body { 
+            background-color: var(--dark-bg); 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            background-attachment: fixed;
+        }
+
+        /* Ombré Typography */
+        .text-gradient {
+            background: var(--ombre-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glow-pink { text-shadow: 0 0 20px rgba(255, 45, 149, 0.5); }
+
+        /* Glass Cards with Gradient Borders */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.2);
+        }
+
+        /* Ombré Button */
+        .btn-ombre {
+            background: var(--ombre-grad);
+            color: black;
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 16px 32px;
+            border-radius: 12px;
+            transition: 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 45, 149, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .btn-ombre:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
+        }
+
+        input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--neon-purple); box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+
+        @media print { .no-print { display: none; } body { background: white; color: black; } }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+
+    <nav class="mb-10 no-print">
+        <a href="index.html" class="font-bold text-sm tracking-widest uppercase hover:text-pink-400 transition">
+            <span style="color: var(--neon-pink)">←</span> Back to Hub
+        </a>
+    </nav>
+
+    <header class="mb-12">
+        <h1 class="text-5xl md:text-7xl font-black mb-4 uppercase italic leading-tight">
+            Lab Trend <br><span class="text-gradient glow-pink">Visualizer™</span>
+        </h1>
+        <p class="text-gray-500 font-bold uppercase tracking-[0.2em] text-sm">Organize patterns doctors can recognize.</p>
+    </header>
+
+    <div class="grid lg:grid-cols-3 gap-10">
+        <aside class="lg:col-span-1 no-print">
+            <div class="glass-card p-8">
+                <h2 class="text-2xl font-black mb-6 uppercase tracking-tighter">Add Entry</h2>
+                <div class="space-y-5">
+                    <div>
+                        <label class="text-[10px] uppercase font-black text-gray-500 mb-1 block">Collection Date</label>
+                        <input type="date" id="labDate">
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-black text-gray-500 mb-1 block">Marker Name (e.g., TSH, CRP)</label>
+                        <input type="text" id="labName" placeholder="Ferritin">
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-black text-gray-500 mb-1 block">Result Value</label>
+                        <input type="number" id="labResult" step="any" placeholder="0.00">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] uppercase font-black text-gray-500 mb-1 block">Ref Low</label>
+                            <input type="number" id="refLow" step="any">
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase font-black text-gray-500 mb-1 block">Ref High</label>
+                            <input type="number" id="refHigh" step="any">
+                        </div>
+                    </div>
+                    <button onclick="addEntry()" class="w-full btn-ombre mt-4">Analyze Trend</button>
+                    <button onclick="loadDemoData()" class="w-full py-2 text-[10px] uppercase font-black text-gray-600 hover:text-white transition">Load Demo Data</button>
+                </div>
+            </div>
+        </aside>
+
+        <section class="lg:col-span-2 space-y-10">
+            <div class="glass-card p-8 min-h-[400px]">
+                <h3 class="text-sm font-black uppercase text-gray-500 mb-6 tracking-widest">Live Trend Projection</h3>
+                <canvas id="trendChart"></canvas>
+            </div>
+
+            <div id="summaryCard" class="hidden bg-white text-black p-10 rounded-none border-t-[12px] border-pink-500 shadow-2xl">
+                <div class="flex justify-between items-start border-b-2 border-black pb-6 mb-8">
+                    <div>
+                        <h2 class="text-4xl font-black uppercase italic leading-none">The Receipts</h2>
+                        <p class="text-xs font-bold mt-2 uppercase tracking-widest">Unhinged N Loud™ Advocacy Tool</p>
+                    </div>
+                    <div class="text-[10px] font-bold text-right uppercase leading-tight">
+                        Educational Data<br>Not Medical Advice
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <div id="statusAlert" class="py-4 px-6 text-2xl font-black italic uppercase text-center tracking-tighter"></div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-black text-xs uppercase border-b border-black mb-3">Trend Summary</h4>
+                            <p id="trendAnalysis" class="text-lg leading-snug"></p>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-xs uppercase border-b border-black mb-3">Questions for My Doctor</h4>
+                            <ul id="followUpList" class="text-sm italic space-y-2 list-none"></ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 no-print flex gap-4">
+                    <button onclick="window.print()" class="bg-black text-white px-8 py-4 font-black uppercase text-sm hover:bg-zinc-800 transition flex-1">Download PDF</button>
+                    <button onclick="location.reload()" class="border-2 border-black px-8 py-4 font-black uppercase text-sm hover:bg-zinc-100 transition flex-1">Clear Data</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        let labEntries = [];
+        let chart = null;
+
+        function addEntry() {
+            const entry = {
+                date: document.getElementById('labDate').value,
+                name: document.getElementById('labName').value.toUpperCase(),
+                val: parseFloat(document.getElementById('labResult').value),
+                low: parseFloat(document.getElementById('refLow').value),
+                high: parseFloat(document.getElementById('refHigh').value)
+            };
+
+            if(!entry.date || isNaN(entry.val)) return alert("Please enter valid date and result.");
+
+            labEntries.push(entry);
+            labEntries.sort((a,b) => new Date(a.date) - new Date(b.date));
+            renderAll();
+        }
+
+        function loadDemoData() {
+            labEntries = [
+                {date: '2026-01-10', name: 'FERRITIN', val: 12, low: 30, high: 150},
+                {date: '2026-02-15', name: 'FERRITIN', val: 9, low: 30, high: 150},
+                {date: '2026-03-18', name: 'FERRITIN', val: 7, low: 30, high: 150}
+            ];
+            renderAll();
+        }
+
+        function renderAll() {
+            updateChart();
+            generateAdvocacySheet();
+            document.getElementById('summaryCard').classList.remove('hidden');
+            window.scrollTo({ top: document.getElementById('summaryCard').offsetTop, behavior: 'smooth' });
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if(chart) chart.destroy();
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labEntries.map(e => e.date),
+                    datasets: [{
+                        label: labEntries[0].name,
+                        data: labEntries.map(e => e.val),
+                        borderColor: '#FF2D95',
+                        borderWidth: 4,
+                        backgroundColor: 'rgba(255, 45, 149, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#00E5FF'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#888' }, grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function generateAdvocacySheet() {
+            const last = labEntries[labEntries.length - 1];
+            const name = last.name;
+            const statusBox = document.getElementById('statusAlert');
+            const analysis = document.getElementById('trendAnalysis');
+            
+            // Branding Logic
+            if (last.val > last.high || last.val < last.low) {
+                statusBox.innerText = `Out of Range: ${name}`;
+                statusBox.style.background = '#000';
+                statusBox.style.color = '#FF2D95';
+            } else {
+                statusBox.innerText = `Within Range: ${name}`;
+                statusBox.style.background = '#f4f4f4';
+                statusBox.style.color = '#000';
+            }
+
+            let direction = "stable";
+            if (labEntries.length > 1) {
+                const prev = labEntries[labEntries.length - 2].val;
+                direction = last.val > prev ? "trending upward" : "trending downward";
+            }
+
+            analysis.innerText = `The most recent ${name} value is ${last.val}. Over the last ${labEntries.length} tests, the data is ${direction}. This visualization is provided to support clinical dialogue regarding symptom correlation.`;
+
+            document.getElementById('followUpList').innerHTML = `
+                <li>• "Given this ${direction}, should we adjust my dosage?"</li>
+                <li>• "Does this shift explain the increase in my clinical symptoms?"</li>
+                <li>• "What is the next objective step if this trend continues?"</li>
+            `;
+        }
+    </script>
+</body>
+</html>
