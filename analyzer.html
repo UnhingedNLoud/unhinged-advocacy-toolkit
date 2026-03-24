@@ -220,10 +220,9 @@
             alert("Advocacy summary copied to clipboard.");
         }
   function handlePrint() {
-    const email = prompt(
-        "This pattern is NOT random.\n\nGet your Doctor Summary + Symptom Tracker + Follow-Up Questions.\n\nEnter your email to unlock:"
-    );
-
+   const email = prompt(
+  "This pattern is NOT random.\n\nGet your Doctor Summary + Symptom Tracker + Follow-Up Questions.\n\nEnter your email to unlock:"
+);
     if (email && email.includes("@")) {
         console.log("Captured email:", email);
         alert("Your summary is ready. You can now download or print it.");
