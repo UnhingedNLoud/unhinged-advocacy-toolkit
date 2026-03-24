@@ -101,28 +101,9 @@
       ></textarea>
 
       <div class="mt-6 flex flex-col md:flex-row gap-4">
-        <button onclick="analyzeData()" class="btn-main md:w-auto">Generate Receipts</button>
+        <button onclick="analyzeData()" class="btn-main md:w-auto">Build My Report</button>
         <button onclick="loadDemo()" class="small-link">Load Demo</button>
         <button onclick="clearAll()" class="small-link">Clear All</button>
-      </div>
-    </section>
-
-    <section class="card mb-8">
-      <h3 class="text-lg font-black uppercase mb-4">Live Summary Preview</h3>
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="border border-gray-800 rounded-xl p-4 min-h-[160px]">
-          <div class="text-xs uppercase font-black text-pink-400 mb-2">Clinical Mirroring</div>
-          <div id="previewClinical" class="text-sm text-gray-300">
-            Run the analyzer to generate your mirrored clinical language.
-          </div>
-        </div>
-
-        <div class="border border-gray-800 rounded-xl p-4 min-h-[160px]">
-          <div class="text-xs uppercase font-black text-cyan-400 mb-2">Pattern Recognition</div>
-          <div id="previewPattern" class="text-sm text-gray-300">
-            Run the analyzer to detect patterns worth tracking and discussing.
-          </div>
-        </div>
       </div>
     </section>
 
@@ -228,11 +209,9 @@
       if (!input) return;
 
       let clinicalHTML = "";
-      const previewMatches = [];
 
       for (const [key, value] of Object.entries(clinicalMap)) {
         if (input.includes(key)) {
-          previewMatches.push(`"${key}" → ${value}`);
           clinicalHTML += `
             <div class="p-4 border border-gray-300">
               <span class="block text-[10px] font-black uppercase text-pink-600">Patient Term: "${key}"</span>
@@ -250,11 +229,9 @@
             </div>
           </div>
         `;
-        previewMatches.push("No direct keyword matches detected yet.");
       }
 
       document.getElementById('clinicalTranslation').innerHTML = clinicalHTML;
-      document.getElementById('previewClinical').innerHTML = previewMatches.join("<br>");
 
       let patternText = "No clear correlations detected in this single entry. Continue logging to identify stronger trends over time.";
 
@@ -271,7 +248,6 @@
       }
 
       document.getElementById('patternsFound').innerText = patternText;
-      document.getElementById('previewPattern').innerText = patternText;
 
       const questions = [
         "Based on these receipts, how do we differentiate between disease activity and medication side effects?",
@@ -298,10 +274,6 @@
 
     function clearAll() {
       document.getElementById('rawInput').value = "";
-      document.getElementById('previewClinical').innerHTML =
-        "Run the analyzer to generate your mirrored clinical language.";
-      document.getElementById('previewPattern').innerHTML =
-        "Run the analyzer to detect patterns worth tracking and discussing.";
       document.getElementById('clinicalTranslation').innerHTML = `
         <div class="p-4 border border-gray-300 md:col-span-2">
           <div class="text-lg font-medium text-gray-700">
