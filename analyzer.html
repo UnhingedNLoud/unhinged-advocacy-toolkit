@@ -127,9 +127,32 @@
                 </div>
             </div>
 
+            <div class="mt-8 p-6 border-2 border-pink-500 bg-black text-white shadow-lg">
+  <h3 class="font-black uppercase text-lg text-pink-500">
+    WHAT THIS MEANS FOR YOU:
+  </h3>
+
+  <p class="mt-2 text-sm">
+    If these symptoms are repeating, overlapping, or getting worse, this is not random.
+  </p>
+
+  <p class="mt-2 text-sm font-bold text-cyan-400">
+    This is where you advocate.
+  </p>
+
+  <p class="mt-2 text-sm">
+    Bring this summary to your doctor and ask:
+  </p>
+
+  <ul class="list-disc pl-5 mt-2 text-sm">
+    <li>"What pattern do you see across these symptoms?"</li>
+    <li>"Could these symptoms point to inflammation, immune dysfunction, or another underlying process?"</li>
+    <li>"What testing or follow-up would help rule this in or out?"</li>
+  </ul>
+</div>
             <div class="mt-10 no-print flex flex-col md:flex-row gap-4">
                 <button onclick="window.print()" class="btn-ombre flex-1">Download PDF Receipt</button>
-                <button onclick="copySummary()" class="border-2 border-white/20 hover:border-white transition py-4 px-8 rounded-xl font-bold uppercase text-xs flex-1">Copy Summary Text</button>
+               <button onclick="handlePrint()" class="btn-ombre flex-1">Download Doctor Summary</button>
             </div>
         </div>
     </main>
@@ -196,6 +219,19 @@
             navigator.clipboard.writeText(content);
             alert("Advocacy summary copied to clipboard.");
         }
+  function handlePrint() {
+    const email = prompt(
+        "This pattern is NOT random.\n\nGet your Doctor Summary + Symptom Tracker + Follow-Up Questions.\n\nEnter your email to unlock:"
+    );
+
+    if (email && email.includes("@")) {
+        console.log("Captured email:", email);
+        alert("Your summary is ready. You can now download or print it.");
+        window.print();
+    } else {
+        alert("Please enter a valid email to continue.");
+    }
+}
     </script>
 </body>
 </html>
