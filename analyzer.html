@@ -230,16 +230,14 @@
     );
 
     if (email && email.includes("@")) {
-
-        // 👇 TARGET WHAT GETS TURNED INTO PDF
         const element = document.getElementById("printableArea");
 
         const opt = {
-            margin:       0.5,
-            filename:     'UNL_Doctor_Summary.pdf',
-            image:        { type: 'jpeg', quality: 1 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            margin: 0.5,
+            filename: 'UNL_Doctor_Summary.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
         html2pdf().set(opt).from(element).save();
