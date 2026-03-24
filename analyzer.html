@@ -128,7 +128,7 @@
                 </div>
             </div>
 
-           <div id="printableArea">
+
   <div class="mt-8 p-6 border-2 border-pink-500 bg-black text-white shadow-lg">
 
     <!-- EVERYTHING INSIDE stays the same -->
@@ -240,7 +240,9 @@
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(element).save();
+       setTimeout(() => {
+  html2pdf().set(opt).from(element).save();
+}, 800);
 
     } else {
         alert("Please enter a valid email to continue.");
