@@ -67,7 +67,9 @@
         }
 
         textarea:focus { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 45, 149, 0.2); }
-
+#outputArea {
+    overflow-anchor: none;
+}
         @media print { .no-print { display: none; } body { background: white; color: black; } }
     </style>
 </head>
@@ -174,6 +176,9 @@
         };
 
         function analyzeData() {
+            if (document.activeElement) {
+    document.activeElement.blur();
+}
             const input = document.getElementById('rawInput').value.toLowerCase();
             if(!input) return;
 
@@ -188,7 +193,6 @@
             }
             const outputArea = document.getElementById('outputArea');
 
-outputArea.style.scrollMarginTop = "100px";
            
 
             // 2. Simple Patterns
@@ -207,10 +211,7 @@ outputArea.style.scrollMarginTop = "100px";
                 "Are these specific cognitive symptoms typical for my clinical profile?",
                 "What objective markers should we track alongside these subjective logs?"
             ];
-            document.getElementById('suggestedQuestions').innerHTML = questions.map(q => `<li>• "${q}"</li>`).join('');
-            
-            window.scrollTo({ top: document.getElementById('outputArea').offsetTop, behavior: 'smooth' });
-        }
+            document.getElementById('suggestedQuestions').innerHTML = questions.map(q => `<li>• "${q}"</li>`).
 
         function loadDemo() {
             document.getElementById('rawInput').value = "I've been feeling totally wiped out for three days. My brain fog is so bad I can't drive. My joints hurt and I'm feeling shaky even though I took my meds.";
@@ -218,9 +219,9 @@ outputArea.style.scrollMarginTop = "100px";
         }
 
         function clearAll() {
-            document.getElementById('rawInput').value = "";
-            document.getElementById('outputArea').classList.add('hidden');
-        }
+    document.getElementById('rawInput').value = "";
+}
+    
 
         function copySummary() {
             const content = document.getElementById('printableArea').innerText;
