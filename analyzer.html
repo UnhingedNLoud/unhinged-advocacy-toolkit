@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>THE LAB | Biometric Analyzer™</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -15,8 +15,12 @@
       --neon-purple: #a855f7;
       --neon-blue: #00e5ff;
       --dark-bg: #000000;
-      --glass-bg: rgba(255,255,255,0.03);
+      --glass-bg: rgba(255,255,255,0.04);
       --ombre-grad: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
+    }
+
+    html, body {
+      overflow-anchor: none;
     }
 
     body {
@@ -38,8 +42,8 @@
     .glass-card {
       background: var(--glass-bg);
       backdrop-filter: blur(12px);
-      border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
     }
 
     .btn-ombre {
@@ -47,26 +51,27 @@
       color: black;
       font-weight: 900;
       text-transform: uppercase;
-      padding: 16px 32px;
+      padding: 16px 28px;
       border-radius: 12px;
-      transition: 0.3s ease;
-      box-shadow: 0 0 15px rgba(255, 45, 149, 0.3);
+      transition: 0.25s ease;
+      box-shadow: 0 0 16px rgba(255, 45, 149, 0.25);
     }
 
     .btn-ombre:hover {
       transform: translateY(-2px);
-      box-shadow: 0 0 25px rgba(0, 229, 255, 0.45);
+      box-shadow: 0 0 24px rgba(0, 229, 255, 0.35);
     }
 
     textarea {
+      width: 100%;
+      min-height: 180px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
       color: white;
-      padding: 20px;
       border-radius: 12px;
-      width: 100%;
+      padding: 20px;
       outline: none;
-      resize: none;
+      resize: vertical;
     }
 
     textarea:focus {
@@ -74,7 +79,20 @@
       box-shadow: 0 0 15px rgba(255,45,149,0.35);
     }
 
-    #outputArea {
+    .subtle-btn {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: #9ca3af;
+      letter-spacing: 0.08em;
+    }
+
+    .subtle-btn:hover {
+      color: white;
+    }
+
+    #resultsSection,
+    #printableArea {
       overflow-anchor: none;
     }
 
@@ -86,6 +104,7 @@
       .no-print {
         display: none !important;
       }
+
       body {
         background: white !important;
         color: black !important;
@@ -110,86 +129,98 @@
     </p>
   </header>
 
-  <main class="max-w-4xl">
-    <section class="glass-card p-8 mb-12 no-print">
+  <main class="max-w-5xl">
+    <section class="glass-card p-8 mb-10 no-print">
       <h2 class="text-xl font-black mb-4 uppercase tracking-tight">Dump the Data</h2>
 
       <textarea
         id="rawInput"
-        rows="6"
-        placeholder="Paste your symptom notes, pain logs, observations, patterns, medication notes, fatigue, brain fog, dizziness, flares..."
+        placeholder="Paste your symptom notes, flare notes, pain logs, fatigue patterns, brain fog episodes, dizziness, medication notes, observations..."
       ></textarea>
 
       <div class="mt-8 flex flex-wrap gap-4 items-center">
         <button onclick="analyzeData()" class="btn-ombre">Generate Receipts</button>
-        <button onclick="loadDemo()" class="text-[10px] uppercase font-black text-gray-400 hover:text-white">Load Demo</button>
-        <button onclick="clearAll()" class="text-[10px] uppercase font-black text-gray-400 hover:text-white">Clear All</button>
+        <button onclick="loadDemo()" class="subtle-btn">Load Demo</button>
+        <button onclick="clearAll()" class="subtle-btn">Clear All</button>
       </div>
     </section>
 
-    <div id="outputArea">
+    <section id="resultsSection" class="space-y-8 min-h-[900px]">
       <div id="emptyState" class="glass-card p-8 text-gray-400">
         Run the analyzer to generate your clinical summary and doctor dialogue prompts.
       </div>
 
-      <div id="resultsWrap" class="hidden-block">
-        <div id="printableArea" class="bg-white text-black p-10 shadow-2xl border-t-[12px]" style="border-color: var(--neon-pink);">
-          <div class="flex justify-between items-start border-b-2 border-black pb-6 mb-8">
-            <div>
-              <h2 class="text-4xl font-black uppercase italic leading-none">Advocacy Prep</h2>
-              <p class="text-xs font-bold mt-2 uppercase tracking-widest">Unhinged N Loud™ The Lab</p>
-            </div>
-            <div class="text-[9px] font-bold text-right uppercase">
-              For patient use only.<br>Not a medical diagnosis.
-            </div>
+      <div id="livePreview" class="glass-card p-8 hidden-block">
+        <h3 class="text-lg font-black uppercase mb-4 text-gradient">Live Summary Preview</h3>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="border border-white/10 rounded-xl p-4">
+            <div class="text-xs uppercase font-black text-pink-400 mb-2">Clinical Mirroring</div>
+            <div id="previewClinical" class="text-sm text-gray-200 leading-relaxed"></div>
           </div>
 
-          <div class="space-y-10">
-            <section>
-              <h3 class="bg-black text-white px-3 py-1 inline-block font-black text-xs uppercase tracking-widest mb-3">1. Clinical Mirroring</h3>
-              <div id="clinicalTranslation" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </section>
-
-            <section>
-              <h3 class="bg-black text-white px-3 py-1 inline-block font-black text-xs uppercase tracking-widest mb-3">2. Pattern Recognition</h3>
-              <div id="patternsFound" class="text-lg leading-relaxed font-medium italic text-gray-800"></div>
-            </section>
-
-            <section class="border-l-4 border-pink-500 pl-6">
-              <h3 class="font-black text-xs uppercase mb-3 tracking-widest text-pink-700">3. Suggested Doctor Dialogue</h3>
-              <ul id="suggestedQuestions" class="space-y-3 list-disc pl-5 font-bold italic"></ul>
-            </section>
-
-            <section class="mt-8 p-6 border-2 border-pink-500 bg-black text-white shadow-lg">
-              <h3 class="font-black uppercase text-lg text-pink-500">What This Means For You:</h3>
-
-              <p class="mt-4 text-sm" id="meaningLine1">
-                If these symptoms are repeating, overlapping, or getting worse, this is not random.
-              </p>
-
-              <p class="mt-4 text-sm font-bold text-cyan-400">
-                This is where you advocate.
-              </p>
-
-              <p class="mt-4 text-sm">
-                Bring this summary to your doctor and ask:
-              </p>
-
-              <ul id="followUpListStatic" class="list-disc pl-5 mt-2 text-sm">
-                <li>What pattern do you see across these symptoms?</li>
-                <li>Could these symptoms point to inflammation, immune dysfunction, or another underlying process?</li>
-                <li>What testing or follow-up would help rule this in or out?</li>
-              </ul>
-            </section>
+          <div class="border border-white/10 rounded-xl p-4">
+            <div class="text-xs uppercase font-black text-cyan-400 mb-2">Pattern Recognition</div>
+            <div id="previewPattern" class="text-sm text-gray-200 leading-relaxed"></div>
           </div>
-        </div>
-
-        <div class="mt-10 no-print flex flex-col md:flex-row gap-4">
-          <button onclick="downloadReceiptPDF()" class="btn-ombre flex-1">Download PDF Receipt</button>
-          <button onclick="handleDoctorSummary()" class="btn-ombre flex-1">Download Doctor Summary</button>
         </div>
       </div>
-    </div>
+
+      <div id="printableArea" class="hidden-block bg-white text-black p-10 shadow-2xl border-t-[12px]" style="border-color: var(--neon-pink);">
+        <div class="flex justify-between items-start border-b-2 border-black pb-6 mb-8">
+          <div>
+            <h2 class="text-4xl font-black uppercase italic leading-none">Advocacy Prep</h2>
+            <p class="text-xs font-bold mt-2 uppercase tracking-widest">Unhinged N Loud™ The Lab</p>
+          </div>
+          <div class="text-[9px] font-bold text-right uppercase">
+            For patient use only.<br>Not a medical diagnosis.
+          </div>
+        </div>
+
+        <div class="space-y-10">
+          <section>
+            <h3 class="bg-black text-white px-3 py-1 inline-block font-black text-xs uppercase tracking-widest mb-3">1. Clinical Mirroring</h3>
+            <div id="clinicalTranslation" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </section>
+
+          <section>
+            <h3 class="bg-black text-white px-3 py-1 inline-block font-black text-xs uppercase tracking-widest mb-3">2. Pattern Recognition</h3>
+            <div id="patternsFound" class="text-lg leading-relaxed font-medium italic text-gray-800"></div>
+          </section>
+
+          <section class="border-l-4 border-pink-500 pl-6">
+            <h3 class="font-black text-xs uppercase mb-3 tracking-widest text-pink-700">3. Suggested Doctor Dialogue</h3>
+            <ul id="suggestedQuestions" class="space-y-3 list-disc pl-5 font-bold italic"></ul>
+          </section>
+
+          <section class="mt-8 p-6 border-2 border-pink-500 bg-black text-white shadow-lg">
+            <h3 class="font-black uppercase text-lg text-pink-500">What This Means For You:</h3>
+
+            <p class="mt-4 text-sm" id="meaningLine1">
+              If these symptoms are repeating, overlapping, or getting worse, this is not random.
+            </p>
+
+            <p class="mt-4 text-sm font-bold text-cyan-400">
+              This is where you advocate.
+            </p>
+
+            <p class="mt-4 text-sm">
+              Bring this summary to your doctor and ask:
+            </p>
+
+            <ul id="followUpListStatic" class="list-disc pl-5 mt-2 text-sm">
+              <li>What pattern do you see across these symptoms?</li>
+              <li>Could these symptoms point to inflammation, immune dysfunction, or another underlying process?</li>
+              <li>What testing or follow-up would help rule this in or out?</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+
+      <div id="actionButtons" class="mt-6 no-print hidden-block flex flex-col md:flex-row gap-4">
+        <button onclick="downloadReceiptPDF()" class="btn-ombre flex-1">Download PDF Receipt</button>
+        <button onclick="handleDoctorSummary()" class="btn-ombre flex-1">Download Doctor Summary</button>
+      </div>
+    </section>
   </main>
 
   <script>
@@ -207,28 +238,35 @@
       "burning": "Reports burning or neuropathic-type sensation",
       "nausea": "Reports nausea/gastrointestinal distress",
       "headache": "Reports headache symptoms",
-      "tingling": "Reports paresthesia/tingling sensation"
+      "tingling": "Reports paresthesia/tingling sensation",
+      "joint pain": "Reports joint-based inflammatory discomfort",
+      "lightheaded": "Reports lightheadedness/possible orthostatic symptoms"
     };
+
+    function showResults() {
+      document.getElementById('emptyState').classList.add('hidden-block');
+      document.getElementById('livePreview').classList.remove('hidden-block');
+      document.getElementById('printableArea').classList.remove('hidden-block');
+      document.getElementById('actionButtons').classList.remove('hidden-block');
+    }
 
     function analyzeData() {
       if (document.activeElement) {
         document.activeElement.blur();
       }
 
-      const rawInput = document.getElementById('rawInput');
-      const input = rawInput.value.toLowerCase().trim();
+      const rawInputEl = document.getElementById('rawInput');
+      const input = rawInputEl.value.toLowerCase().trim();
       if (!input) return;
 
-      const emptyState = document.getElementById('emptyState');
-      const resultsWrap = document.getElementById('resultsWrap');
+      showResults();
 
-      emptyState.classList.add('hidden-block');
-      resultsWrap.classList.remove('hidden-block');
-
-      // 1. Clinical Translation
       let clinicalHTML = "";
+      const previewMatches = [];
+
       for (const [key, value] of Object.entries(clinicalMap)) {
         if (input.includes(key)) {
+          previewMatches.push(`"${key}" → ${value}`);
           clinicalHTML += `
             <div class="p-4 border border-gray-300">
               <span class="block text-[10px] font-black uppercase text-pink-600">Patient Term: "${key}"</span>
@@ -241,14 +279,17 @@
       if (!clinicalHTML) {
         clinicalHTML = `
           <div class="p-4 border border-gray-300 md:col-span-2">
-            <div class="text-lg font-medium text-gray-700">No direct keyword matches detected. Continue logging more specific symptom language for stronger translation.</div>
+            <div class="text-lg font-medium text-gray-700">
+              No direct keyword matches detected. Continue logging more specific symptom language for stronger translation.
+            </div>
           </div>
         `;
+        previewMatches.push("No direct keyword matches detected yet.");
       }
 
       document.getElementById('clinicalTranslation').innerHTML = clinicalHTML;
+      document.getElementById('previewClinical').innerHTML = previewMatches.join("<br>");
 
-      // 2. Pattern Recognition
       let patternText = "No clear correlations detected in this single entry. Continue logging to identify stronger trends over time.";
 
       if (input.includes('sleep') && (input.includes('pain') || input.includes('fatigue'))) {
@@ -264,8 +305,8 @@
       }
 
       document.getElementById('patternsFound').innerText = patternText;
+      document.getElementById('previewPattern').innerText = patternText;
 
-      // 3. Questions
       const questions = [
         "Based on these receipts, how do we differentiate between disease activity and medication side effects?",
         "Are these specific cognitive symptoms typical for my clinical profile?",
@@ -275,7 +316,6 @@
       document.getElementById('suggestedQuestions').innerHTML =
         questions.map(q => `<li>${q}</li>`).join('');
 
-      // Meaning line
       const meaningLine1 = document.getElementById('meaningLine1');
       if (input.includes('worse') || input.includes('flare') || input.includes('fatigue') || input.includes('brain fog')) {
         meaningLine1.innerText = "If these symptoms are repeating, overlapping, or getting worse, this is not random.";
@@ -293,7 +333,11 @@
     function clearAll() {
       document.getElementById('rawInput').value = "";
       document.getElementById('emptyState').classList.remove('hidden-block');
-      document.getElementById('resultsWrap').classList.add('hidden-block');
+      document.getElementById('livePreview').classList.add('hidden-block');
+      document.getElementById('printableArea').classList.add('hidden-block');
+      document.getElementById('actionButtons').classList.add('hidden-block');
+      document.getElementById('previewClinical').innerHTML = "";
+      document.getElementById('previewPattern').innerHTML = "";
       document.getElementById('clinicalTranslation').innerHTML = "";
       document.getElementById('patternsFound').innerText = "";
       document.getElementById('suggestedQuestions').innerHTML = "";
