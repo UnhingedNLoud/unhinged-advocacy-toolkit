@@ -90,8 +90,9 @@
         document.activeElement.blur();
       }
 
-      sessionStorage.setItem('analyzerInput', input);
-      window.location.href = 'analyzer-report.html';
+      const url = 'analyzer-report.html?input=' + encodeURIComponent(input) + '&t=' + Date.now();
+
+      window.open(url, '_blank');
     }
 
     function loadDemo() {
@@ -101,7 +102,6 @@
 
     function clearAll() {
       document.getElementById('rawInput').value = "";
-      sessionStorage.removeItem('analyzerInput');
     }
   </script>
 </body>
