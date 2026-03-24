@@ -27,6 +27,7 @@
       background: var(--dark-bg);
       color: white;
       font-family: 'Inter', sans-serif;
+      padding-bottom: 140px;
     }
 
     .text-gradient {
@@ -51,14 +52,15 @@
       color: black;
       font-weight: 900;
       text-transform: uppercase;
-      padding: 16px 28px;
+      padding: 16px 24px;
       border-radius: 12px;
       transition: 0.25s ease;
       box-shadow: 0 0 16px rgba(255, 45, 149, 0.25);
+      width: 100%;
     }
 
     .btn-ombre:hover {
-      transform: translateY(-2px);
+      transform: translateY(-1px);
       box-shadow: 0 0 24px rgba(0, 229, 255, 0.35);
     }
 
@@ -96,18 +98,42 @@
       overflow-anchor: none;
     }
 
-    .hidden-block {
-      display: none;
+    .sticky-actions {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 999;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding: 14px;
+    }
+
+    .sticky-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 767px) {
+      .sticky-wrap {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media print {
-      .no-print {
+      .no-print,
+      .sticky-actions {
         display: none !important;
       }
 
       body {
         background: white !important;
         color: black !important;
+        padding-bottom: 0 !important;
       }
     }
   </style>
@@ -129,7 +155,7 @@
     </p>
   </header>
 
-  <main class="max-w-5xl">
+  <main class="max-w-5xl mx-auto">
     <section class="glass-card p-8 mb-10 no-print">
       <h2 class="text-xl font-black mb-4 uppercase tracking-tight">Dump the Data</h2>
 
@@ -139,33 +165,33 @@
       ></textarea>
 
       <div class="mt-8 flex flex-wrap gap-4 items-center">
-        <button onclick="analyzeData()" class="btn-ombre">Generate Receipts</button>
+        <button onclick="analyzeData()" class="btn-ombre !w-auto">Generate Receipts</button>
         <button onclick="loadDemo()" class="subtle-btn">Load Demo</button>
         <button onclick="clearAll()" class="subtle-btn">Clear All</button>
       </div>
     </section>
 
-    <section id="resultsSection" class="space-y-8 min-h-[900px]">
-      <div id="emptyState" class="glass-card p-8 text-gray-400">
-        Run the analyzer to generate your clinical summary and doctor dialogue prompts.
-      </div>
-
-      <div id="livePreview" class="glass-card p-8 hidden-block">
+    <section id="resultsSection" class="space-y-8">
+      <div class="glass-card p-8">
         <h3 class="text-lg font-black uppercase mb-4 text-gradient">Live Summary Preview</h3>
         <div class="grid gap-4 md:grid-cols-2">
-          <div class="border border-white/10 rounded-xl p-4">
+          <div class="border border-white/10 rounded-xl p-4 min-h-[180px]">
             <div class="text-xs uppercase font-black text-pink-400 mb-2">Clinical Mirroring</div>
-            <div id="previewClinical" class="text-sm text-gray-200 leading-relaxed"></div>
+            <div id="previewClinical" class="text-sm text-gray-200 leading-relaxed">
+              Run the analyzer to generate your mirrored clinical language.
+            </div>
           </div>
 
-          <div class="border border-white/10 rounded-xl p-4">
+          <div class="border border-white/10 rounded-xl p-4 min-h-[180px]">
             <div class="text-xs uppercase font-black text-cyan-400 mb-2">Pattern Recognition</div>
-            <div id="previewPattern" class="text-sm text-gray-200 leading-relaxed"></div>
+            <div id="previewPattern" class="text-sm text-gray-200 leading-relaxed">
+              Run the analyzer to detect patterns worth tracking and discussing.
+            </div>
           </div>
         </div>
       </div>
 
-      <div id="printableArea" class="hidden-block bg-white text-black p-10 shadow-2xl border-t-[12px]" style="border-color: var(--neon-pink);">
+      <div id="printableArea" class="bg-white text-black p-10 shadow-2xl border-t-[12px]" style="border-color: var(--neon-pink);">
         <div class="flex justify-between items-start border-b-2 border-black pb-6 mb-8">
           <div>
             <h2 class="text-4xl font-black uppercase italic leading-none">Advocacy Prep</h2>
@@ -179,17 +205,27 @@
         <div class="space-y-10">
           <section>
             <h3 class="bg-black text-white px-3 py-1 inline-block font-black text-xs uppercase tracking-widest mb-3">1. Clinical Mirroring</h3>
-            <div id="clinicalTranslation" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            <div id="clinicalTranslation" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="p-4 border border-gray-300 md:col-span-2">
+                <div class="text-lg font-medium text-gray-700">
+                  Run the analyzer to generate your clinical translation.
+                </div>
+              </div>
+            </div>
           </section>
 
           <section>
             <h3 class="bg-black text-white px-3 py-1 inline-block font-black text-xs uppercase tracking-widest mb-3">2. Pattern Recognition</h3>
-            <div id="patternsFound" class="text-lg leading-relaxed font-medium italic text-gray-800"></div>
+            <div id="patternsFound" class="text-lg leading-relaxed font-medium italic text-gray-800">
+              No analysis yet.
+            </div>
           </section>
 
           <section class="border-l-4 border-pink-500 pl-6">
             <h3 class="font-black text-xs uppercase mb-3 tracking-widest text-pink-700">3. Suggested Doctor Dialogue</h3>
-            <ul id="suggestedQuestions" class="space-y-3 list-disc pl-5 font-bold italic"></ul>
+            <ul id="suggestedQuestions" class="space-y-3 list-disc pl-5 font-bold italic">
+              <li>Run the analyzer to generate your suggested follow-up questions.</li>
+            </ul>
           </section>
 
           <section class="mt-8 p-6 border-2 border-pink-500 bg-black text-white shadow-lg">
@@ -215,13 +251,15 @@
           </section>
         </div>
       </div>
-
-      <div id="actionButtons" class="mt-6 no-print hidden-block flex flex-col md:flex-row gap-4">
-        <button onclick="downloadReceiptPDF()" class="btn-ombre flex-1">Download PDF Receipt</button>
-        <button onclick="handleDoctorSummary()" class="btn-ombre flex-1">Download Doctor Summary</button>
-      </div>
     </section>
   </main>
+
+  <div class="sticky-actions no-print">
+    <div class="sticky-wrap">
+      <button onclick="downloadReceiptPDF()" class="btn-ombre">Download PDF Receipt</button>
+      <button onclick="handleDoctorSummary()" class="btn-ombre">Download Doctor Summary</button>
+    </div>
+  </div>
 
   <script>
     const clinicalMap = {
@@ -243,13 +281,6 @@
       "lightheaded": "Reports lightheadedness/possible orthostatic symptoms"
     };
 
-    function showResults() {
-      document.getElementById('emptyState').classList.add('hidden-block');
-      document.getElementById('livePreview').classList.remove('hidden-block');
-      document.getElementById('printableArea').classList.remove('hidden-block');
-      document.getElementById('actionButtons').classList.remove('hidden-block');
-    }
-
     function analyzeData() {
       if (document.activeElement) {
         document.activeElement.blur();
@@ -258,8 +289,6 @@
       const rawInputEl = document.getElementById('rawInput');
       const input = rawInputEl.value.toLowerCase().trim();
       if (!input) return;
-
-      showResults();
 
       let clinicalHTML = "";
       const previewMatches = [];
@@ -332,15 +361,20 @@
 
     function clearAll() {
       document.getElementById('rawInput').value = "";
-      document.getElementById('emptyState').classList.remove('hidden-block');
-      document.getElementById('livePreview').classList.add('hidden-block');
-      document.getElementById('printableArea').classList.add('hidden-block');
-      document.getElementById('actionButtons').classList.add('hidden-block');
-      document.getElementById('previewClinical').innerHTML = "";
-      document.getElementById('previewPattern').innerHTML = "";
-      document.getElementById('clinicalTranslation').innerHTML = "";
-      document.getElementById('patternsFound').innerText = "";
-      document.getElementById('suggestedQuestions').innerHTML = "";
+      document.getElementById('previewClinical').innerHTML =
+        "Run the analyzer to generate your mirrored clinical language.";
+      document.getElementById('previewPattern').innerHTML =
+        "Run the analyzer to detect patterns worth tracking and discussing.";
+      document.getElementById('clinicalTranslation').innerHTML = `
+        <div class="p-4 border border-gray-300 md:col-span-2">
+          <div class="text-lg font-medium text-gray-700">
+            Run the analyzer to generate your clinical translation.
+          </div>
+        </div>
+      `;
+      document.getElementById('patternsFound').innerText = "No analysis yet.";
+      document.getElementById('suggestedQuestions').innerHTML =
+        `<li>Run the analyzer to generate your suggested follow-up questions.</li>`;
       document.getElementById('meaningLine1').innerText =
         "If these symptoms are repeating, overlapping, or getting worse, this is not random.";
     }
