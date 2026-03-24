@@ -177,7 +177,7 @@
             const input = document.getElementById('rawInput').value.toLowerCase();
             if(!input) return;
 
-            document.getElementById('outputArea').classList.remove('hidden');
+            
             
             // 1. Clinical Translation
             let clinicalHTML = "";
@@ -189,9 +189,7 @@
             const outputArea = document.getElementById('outputArea');
 outputArea.classList.remove('hidden');
 outputArea.style.scrollMarginTop = "100px";
-            setTimeout(() => {
-  window.scrollTo({ top: 0, behavior: 'instant' });
-}, 50);
+           
 
             // 2. Simple Patterns
             let patternText = "No clear correlations detected in this single entry. Continue logging to identify triggers.";
