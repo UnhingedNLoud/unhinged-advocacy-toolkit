@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THE LAB | Biometric Analyzer™</title>
@@ -127,7 +128,10 @@
                 </div>
             </div>
 
-            <div class="mt-8 p-6 border-2 border-pink-500 bg-black text-white shadow-lg">
+           <div id="printableArea">
+  <div class="mt-8 p-6 border-2 border-pink-500 bg-black text-white shadow-lg">
+
+    <!-- EVERYTHING INSIDE stays the same -->
   <h3 class="font-black uppercase text-lg text-pink-500">
     WHAT THIS MEANS FOR YOU:
   </h3>
@@ -149,8 +153,9 @@
     <li>"Could these symptoms point to inflammation, immune dysfunction, or another underlying process?"</li>
     <li>"What testing or follow-up would help rule this in or out?"</li>
   </ul>
-</div>
-            <div class="mt-10 no-print flex flex-col md:flex-row gap-4">
+  </div>
+            </div>
+       <div class="mt-10 no-print flex flex-col md:flex-row gap-4">
                 <button onclick="window.print()" class="btn-ombre flex-1">Download PDF Receipt</button>
                <button onclick="handlePrint()" class="btn-ombre flex-1">Download Doctor Summary</button>
             </div>
@@ -220,18 +225,28 @@
             alert("Advocacy summary copied to clipboard.");
         }
   function handlePrint() {
-   const email = prompt(
-  "This pattern is NOT random.\n\nGet your Doctor Summary + Symptom Tracker + Follow-Up Questions.
-       \n\nEnter your email to unlock your personalized report:"
-);
+    const email = prompt(
+        "This pattern is NOT random.\n\nGet your Doctor Summary + Symptom Tracker + Follow-Up Questions.\n\nEnter your email to unlock your personalized report:"
+    );
+
     if (email && email.includes("@")) {
-        console.log("Captured email:", email);
-        alert("Your summary is ready. You can now download or print it.");
-        window.print();
+
+        // 👇 TARGET WHAT GETS TURNED INTO PDF
+        const element = document.getElementById("printableArea");
+
+        const opt = {
+            margin:       0.5,
+            filename:     'UNL_Doctor_Summary.pdf',
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save();
+
     } else {
         alert("Please enter a valid email to continue.");
     }
 }
     </script>
 </body>
-</html>
