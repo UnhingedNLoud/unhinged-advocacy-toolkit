@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UNL™ Health Analyzer Pro | Unhinged N Loud™</title>
+  <title>UNL™ Advocacy Analyzer | Unhinged N Loud™</title>
   <meta
     name="description"
-    content="Analyze lab values, connect symptoms, track trends, and create a doctor-ready summary with the UNL™ Health Analyzer Pro."
+    content="Analyze lab values, connect symptoms, generate doctor questions, review related labs to discuss, track trends, and create a doctor-ready summary."
   />
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -49,7 +49,7 @@
     }
 
     .wrap {
-      width: min(1100px, calc(100% - 24px));
+      width: min(1120px, calc(100% - 24px));
       margin: 0 auto;
       padding: 18px 0 50px;
     }
@@ -85,7 +85,7 @@
 
     .hero p {
       margin: 12px 0 0;
-      max-width: 850px;
+      max-width: 860px;
       line-height: 1.6;
     }
 
@@ -129,6 +129,10 @@
     h2 {
       margin: 0 0 8px;
       font-size: clamp(1.3rem, 3vw, 2rem);
+    }
+
+    h3 {
+      margin: 0 0 8px;
     }
 
     .muted {
@@ -309,6 +313,35 @@
       transform: scale(1.1);
     }
 
+    .adv-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 14px;
+    }
+
+    .adv-card {
+      background: #08080d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .adv-card h3 {
+      color: var(--cyan);
+      font-size: 1rem;
+    }
+
+    .adv-card ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      line-height: 1.6;
+    }
+
+    .adv-card li + li {
+      margin-top: 6px;
+    }
+
     .canvas-wrap {
       margin-top: 14px;
       background: #06070a;
@@ -366,12 +399,12 @@
     }
 
     @media (max-width: 900px) {
-      .grid.two, .grid.three, .stats {
+      .grid.two, .grid.three, .stats, .adv-grid {
         grid-template-columns: 1fr;
       }
 
       .wrap {
-        width: min(100% - 16px, 1100px);
+        width: min(100% - 16px, 1120px);
         padding-top: 12px;
       }
 
@@ -389,10 +422,10 @@
   <div class="wrap">
     <section class="hero">
       <div class="eyebrow">Unhinged N Loud™</div>
-      <h1>UNL™ HEALTH ANALYZER PRO</h1>
-      <p class="lead">One tool. One flow. Labs + symptoms + trends + doctor summary.</p>
+      <h1>UNL™ ADVOCACY ANALYZER</h1>
+      <p class="lead">Labs + symptoms + doctor questions + related labs to discuss + trend tracking + summary report.</p>
       <p class="sub">
-        This version is built to feel like a real product instead of multiple confusing tools.
+        This version is built to help users understand patterns and prepare for better doctor conversations without replacing medical care.
       </p>
     </section>
 
@@ -400,7 +433,7 @@
       <div class="step">Step 1 · Lab + symptom input</div>
       <h2>Enter Your Information</h2>
       <p class="muted">
-        Start with one lab result, then add symptoms and optional context.
+        Start with one lab result, add symptoms, and the tool will organize both the lab side and the advocacy side.
       </p>
 
       <div class="grid two">
@@ -448,6 +481,8 @@
         <div class="checklist-item"><input type="checkbox" value="Digestive symptoms" class="symptomCheck"> <span>Digestive symptoms</span></div>
         <div class="checklist-item"><input type="checkbox" value="Hair loss" class="symptomCheck"> <span>Hair loss</span></div>
         <div class="checklist-item"><input type="checkbox" value="Headaches" class="symptomCheck"> <span>Headaches</span></div>
+        <div class="checklist-item"><input type="checkbox" value="Dizziness" class="symptomCheck"> <span>Dizziness</span></div>
+        <div class="checklist-item"><input type="checkbox" value="Swelling" class="symptomCheck"> <span>Swelling</span></div>
       </div>
 
       <div class="btn-row">
@@ -485,14 +520,40 @@
         <div id="advocacyLanguage" class="box"></div>
 
         <div class="btn-row">
-          <button class="btn-green" id="openTrendBtn" type="button">Track This Lab Over Time</button>
+          <button class="btn-green" id="openAdvocacyBtn" type="button">View Advocacy Support</button>
+          <button class="btn-dark" id="openTrendBtn" type="button">Track This Lab Over Time</button>
           <button class="btn-primary" id="openReportBtn" type="button">Create Doctor Summary</button>
         </div>
       </div>
     </section>
 
+    <section class="panel green hidden" id="advocacySection">
+      <div class="step">Step 2 · Advocacy support</div>
+      <h2>Questions, Related Labs, and Pattern Clues</h2>
+      <p class="muted">
+        This section helps users organize what to ask, what to discuss, and how to describe what they are noticing.
+      </p>
+
+      <div class="adv-grid">
+        <div class="adv-card">
+          <h3>Questions to Ask Your Doctor</h3>
+          <ul id="doctorQuestionsList"></ul>
+        </div>
+
+        <div class="adv-card">
+          <h3>Related Labs to Discuss</h3>
+          <ul id="relatedLabsList"></ul>
+        </div>
+
+        <div class="adv-card">
+          <h3>Pattern Clues</h3>
+          <ul id="patternCluesList"></ul>
+        </div>
+      </div>
+    </section>
+
     <section class="panel green hidden" id="trendSection">
-      <div class="step">Step 2 · Optional trend tracking</div>
+      <div class="step">Step 3 · Optional trend tracking</div>
       <h2>Track This Lab Over Time</h2>
       <p class="muted">Add more entries to visualize whether this lab is moving up, down, or staying unstable.</p>
 
@@ -523,9 +584,9 @@
     </section>
 
     <section class="panel pink hidden" id="reportSection">
-      <div class="step">Step 3 · Doctor-ready summary</div>
+      <div class="step">Step 4 · Doctor-ready summary</div>
       <h2>Generate Your Report</h2>
-      <p class="muted">This is the polished end step. Add your name and email, preview the summary, then download the PDF.</p>
+      <p class="muted">Add name and email, preview the summary, then download the PDF.</p>
 
       <div class="grid two">
         <div>
@@ -565,7 +626,10 @@
       doctorLine: "",
       advocacyLine: "",
       summaryLine: "",
-      trendEntries: []
+      trendEntries: [],
+      doctorQuestions: [],
+      relatedLabs: [],
+      patternClues: []
     };
 
     const el = {
@@ -589,8 +653,14 @@
       statStatus: document.getElementById("statStatus"),
       doctorLanguage: document.getElementById("doctorLanguage"),
       advocacyLanguage: document.getElementById("advocacyLanguage"),
+      openAdvocacyBtn: document.getElementById("openAdvocacyBtn"),
       openTrendBtn: document.getElementById("openTrendBtn"),
       openReportBtn: document.getElementById("openReportBtn"),
+
+      advocacySection: document.getElementById("advocacySection"),
+      doctorQuestionsList: document.getElementById("doctorQuestionsList"),
+      relatedLabsList: document.getElementById("relatedLabsList"),
+      patternCluesList: document.getElementById("patternCluesList"),
 
       trendSection: document.getElementById("trendSection"),
       trendDate: document.getElementById("trendDate"),
@@ -685,6 +755,130 @@
       return `<strong>Advocacy note:</strong><br>${symptomLine}${contextLine}Even when a lab is ${status.toLowerCase()}, symptoms and repeated patterns still matter. This summary can help organize concerns clearly for a medical visit.`;
     }
 
+    function symptomIncludes(word) {
+      const combined = (state.symptoms + " " + state.context).toLowerCase();
+      return combined.includes(word);
+    }
+
+    function buildDoctorQuestions() {
+      const questions = [
+        `Could this ${state.labName} result be meaningful when looked at together with my symptoms?`,
+        `Should this lab be repeated later to see whether the trend is changing?`,
+        `If this lab is ${state.status.toLowerCase()}, what follow-up testing would you consider based on my symptoms?`,
+        `Are there related markers that would help give more context to this result?`,
+        `If this lab is technically in range, could the trend or symptom pattern still matter clinically?`
+      ];
+
+      if (symptomIncludes("fatigue")) {
+        questions.push("Could fatigue in this pattern relate to thyroid issues, iron status, inflammation, nutrient deficiencies, infection, or sleep disruption?");
+      }
+      if (symptomIncludes("brain fog") || symptomIncludes("dizziness") || symptomIncludes("headache")) {
+        questions.push("Could my neurological symptoms or brain fog be connected to inflammation, thyroid patterns, nutrient issues, or something else that should be ruled out?");
+      }
+      if (symptomIncludes("joint pain") || symptomIncludes("swelling")) {
+        questions.push("Given the joint symptoms or swelling, should inflammation markers or autoimmune-related labs be reviewed more closely?");
+      }
+      if (symptomIncludes("hair loss")) {
+        questions.push("Could hair loss in this pattern relate to thyroid function, iron storage, inflammation, stress, or nutritional issues?");
+      }
+      if (symptomIncludes("digestive")) {
+        questions.push("Could digestive symptoms be affecting absorption or contributing to nutrient issues that are worth checking?");
+      }
+
+      return dedupeArray(questions);
+    }
+
+    function buildRelatedLabs() {
+      let labs = [];
+
+      const labNameLower = state.labName.toLowerCase();
+
+      if (labNameLower.includes("crp") || labNameLower.includes("esr")) {
+        labs.push("ESR", "CRP", "CBC", "CMP", "Ferritin");
+      }
+
+      if (labNameLower.includes("tsh") || labNameLower.includes("thyroid") || symptomIncludes("hair loss") || symptomIncludes("fatigue")) {
+        labs.push("TSH", "Free T3", "Free T4", "TPO antibodies", "Thyroglobulin antibodies");
+      }
+
+      if (symptomIncludes("fatigue") || symptomIncludes("dizziness") || symptomIncludes("brain fog")) {
+        labs.push("CBC", "Ferritin", "Iron panel", "Vitamin B12", "Folate", "Vitamin D");
+      }
+
+      if (symptomIncludes("joint pain") || symptomIncludes("swelling")) {
+        labs.push("ESR", "CRP", "Rheumatoid factor", "Anti-CCP", "ANA");
+      }
+
+      if (symptomIncludes("digestive")) {
+        labs.push("CBC", "CMP", "Ferritin", "Vitamin B12", "Folate", "Vitamin D");
+      }
+
+      if (symptomIncludes("headache")) {
+        labs.push("CBC", "CMP", "Ferritin", "Vitamin B12");
+      }
+
+      if (labs.length === 0) {
+        labs.push("CBC", "CMP", "Ferritin", "Vitamin D", "ESR", "CRP", "TSH");
+      }
+
+      return dedupeArray(labs).map(item => `${item} — discuss with your provider if it fits your symptoms and history.`);
+    }
+
+    function buildPatternClues() {
+      const clues = [];
+
+      if (symptomIncludes("fatigue")) {
+        clues.push("Fatigue can overlap with thyroid patterns, inflammation, low iron stores, vitamin deficiencies, sleep disruption, infection, and more.");
+      }
+      if (symptomIncludes("brain fog")) {
+        clues.push("Brain fog can overlap with inflammation, thyroid imbalance, nutrient issues, nervous system stress, poor sleep, and broader immune patterns.");
+      }
+      if (symptomIncludes("joint pain")) {
+        clues.push("Joint pain may overlap with inflammation, autoimmune activity, injury, infection history, or broader systemic stress.");
+      }
+      if (symptomIncludes("hair loss")) {
+        clues.push("Hair loss may overlap with thyroid function, ferritin or iron issues, inflammation, stress, and nutritional patterns.");
+      }
+      if (symptomIncludes("digestive")) {
+        clues.push("Digestive symptoms may overlap with inflammation, food triggers, microbiome imbalance, absorption issues, or immune system stress.");
+      }
+      if (symptomIncludes("swelling")) {
+        clues.push("Swelling may overlap with inflammation, joint involvement, fluid changes, medication effects, or broader immune activity.");
+      }
+      if (symptomIncludes("headache") || symptomIncludes("dizziness")) {
+        clues.push("Headaches and dizziness may overlap with hydration, nutrient status, inflammation, hormone shifts, blood pressure issues, or nervous system stress.");
+      }
+
+      if (state.status === "HIGH") {
+        clues.push(`A high ${state.labName} result may matter more when symptoms are also increasing or repeating over time.`);
+      }
+      if (state.status === "LOW") {
+        clues.push(`A low ${state.labName} result may matter more when symptoms line up with the drop or the value keeps trending downward.`);
+      }
+      if (state.status === "IN RANGE") {
+        clues.push(`An in-range ${state.labName} does not automatically cancel out symptoms, especially when patterns persist or multiple systems are involved.`);
+      }
+
+      if (clues.length === 0) {
+        clues.push("Symptoms can involve more than one system at the same time. Patterns over time often matter more than one isolated data point.");
+      }
+
+      return dedupeArray(clues);
+    }
+
+    function dedupeArray(arr) {
+      return [...new Set(arr)];
+    }
+
+    function renderList(listEl, items) {
+      listEl.innerHTML = "";
+      items.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        listEl.appendChild(li);
+      });
+    }
+
     function analyze() {
       hideError();
 
@@ -718,6 +912,9 @@
       state.summaryLine = summaryLine;
       state.doctorLine = doctorLine;
       state.advocacyLine = advocacyLine;
+      state.doctorQuestions = buildDoctorQuestions();
+      state.relatedLabs = buildRelatedLabs();
+      state.patternClues = buildPatternClues();
 
       el.resultCard.classList.remove("hidden");
       el.statusPill.className = "status-pill " + statusClass(status);
@@ -731,6 +928,10 @@
       el.doctorLanguage.innerHTML = doctorLine;
       el.advocacyLanguage.innerHTML = advocacyLine;
 
+      renderList(el.doctorQuestionsList, state.doctorQuestions);
+      renderList(el.relatedLabsList, state.relatedLabs);
+      renderList(el.patternCluesList, state.patternClues);
+
       if (state.trendEntries.length === 0) {
         state.trendEntries.push({ date: labDate, value: result });
       }
@@ -738,7 +939,7 @@
       renderEntries();
       drawTrend();
 
-      trackEvent("unl_health_analyzed", { lab_name: labName, status });
+      trackEvent("unl_advocacy_analyzed", { lab_name: labName, status });
     }
 
     function clearAll() {
@@ -764,15 +965,29 @@
       state.doctorLine = "";
       state.advocacyLine = "";
       state.trendEntries = [];
+      state.doctorQuestions = [];
+      state.relatedLabs = [];
+      state.patternClues = [];
 
       el.resultCard.classList.add("hidden");
+      el.advocacySection.classList.add("hidden");
       el.trendSection.classList.add("hidden");
       el.reportSection.classList.add("hidden");
       el.reportPreview.classList.add("hidden");
       el.reportPreview.textContent = "";
+      el.doctorQuestionsList.innerHTML = "";
+      el.relatedLabsList.innerHTML = "";
+      el.patternCluesList.innerHTML = "";
       hideError();
       renderEntries();
       drawTrend();
+    }
+
+    function openAdvocacy() {
+      if (!state.labName) return showError("Analyze a lab first.");
+      el.advocacySection.classList.remove("hidden");
+      el.advocacySection.scrollIntoView({ behavior: "smooth", block: "start" });
+      trackEvent("unl_advocacy_opened", { lab_name: state.labName });
     }
 
     function openTrend() {
@@ -966,6 +1181,12 @@
       });
     }
 
+    function stripHtml(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      return div.textContent || div.innerText || "";
+    }
+
     function buildReport() {
       const patientName = el.patientName.value.trim() || "Patient";
       const patientEmail = el.patientEmail.value.trim() || "Not entered";
@@ -973,7 +1194,7 @@
         ? state.trendEntries.map(e => `${e.date}: ${e.value}`).join("\n")
         : "No trend entries recorded.";
 
-      return `UNL™ HEALTH ANALYZER PRO
+      return `UNL™ ADVOCACY ANALYZER
 Powered by Unhinged N Loud™
 
 Patient Name: ${patientName}
@@ -996,6 +1217,15 @@ ${stripHtml(state.doctorLine)}
 ADVOCACY NOTE
 ${stripHtml(state.advocacyLine)}
 
+QUESTIONS TO ASK YOUR DOCTOR
+${state.doctorQuestions.map(q => "- " + q).join("\n")}
+
+RELATED LABS TO DISCUSS
+${state.relatedLabs.map(l => "- " + l).join("\n")}
+
+PATTERN CLUES
+${state.patternClues.map(c => "- " + c).join("\n")}
+
 SYMPTOMS
 ${state.symptoms || "None entered"}
 
@@ -1006,13 +1236,7 @@ TREND ENTRIES
 ${trendText}
 
 EDUCATIONAL NOTE
-This tool is for organization and advocacy support. It does not diagnose disease or replace medical care.`;
-    }
-
-    function stripHtml(html) {
-      const div = document.createElement("div");
-      div.innerHTML = html;
-      return div.textContent || div.innerText || "";
+This tool is for organization and advocacy support. It does not diagnose disease, recommend treatment, or replace medical care.`;
     }
 
     function generateSummary() {
@@ -1046,7 +1270,7 @@ This tool is for organization and advocacy support. It does not diagnose disease
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(16);
-      doc.text("UNL Health Analyzer Pro Report", 14, y);
+      doc.text("UNL Advocacy Analyzer Report", 14, y);
       y += 10;
 
       doc.setFont("helvetica", "normal");
@@ -1065,13 +1289,14 @@ This tool is for organization and advocacy support. It does not diagnose disease
       });
 
       const safeName = (state.labName || "lab").replace(/\s+/g, "_").toLowerCase();
-      doc.save(`${safeName}_unl_health_report.pdf`);
+      doc.save(`${safeName}_unl_advocacy_report.pdf`);
 
       trackEvent("unl_pdf_downloaded", { lab_name: state.labName });
     }
 
     el.analyzeBtn.addEventListener("click", analyze);
     el.clearBtn.addEventListener("click", clearAll);
+    el.openAdvocacyBtn.addEventListener("click", openAdvocacy);
     el.openTrendBtn.addEventListener("click", openTrend);
     el.openReportBtn.addEventListener("click", openReport);
     el.addTrendBtn.addEventListener("click", addTrend);
