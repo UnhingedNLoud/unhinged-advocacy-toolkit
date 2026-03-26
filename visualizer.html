@@ -1,356 +1,298 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>THE LAB | Lab Trend Visualizer™</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --neon-pink: #FF2D95;
-      --neon-purple: #A855F7;
-      --neon-blue: #00E5FF;
-      --neon-green: #39FF14;
-      --dark-bg: #000000;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --ombre-grad: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
-    }
+<section id="lab-trend-visualizer" style="max-width:900px;margin:40px auto;padding:24px;border-radius:20px;background:rgba(255,255,255,0.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.12);color:white;">
+  <h2 style="margin-top:0;font-size:28px;">Lab Trend Visualizer</h2>
+  <p style="opacity:0.9;">Enter lab values to see the trend and a simple live projection.</p>
 
-    html {
-      scroll-behavior: auto;
-    }
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <label for="trendValues" style="font-weight:600;">Lab Values</label>
+    <input
+      id="trendValues"
+      type="text"
+      placeholder="Example: 2.1, 2.5, 3.0, 3.4"
+      style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(0,0,0,0.25);color:white;font-size:16px;outline:none;box-sizing:border-box;"
+    >
 
-    body {
-      background-color: var(--dark-bg);
-      color: white;
-      font-family: 'Inter', sans-serif;
-      overflow-anchor: none;
-    }
-
-    .text-gradient {
-      background: var(--ombre-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .glow-pink {
-      text-shadow: 0 0 20px rgba(255, 45, 149, 0.5);
-    }
-
-    .glass-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      border-radius: 20px;
-      position: relative;
-      border: 1px solid rgba(255,255,255,0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .glass-card:hover {
-      box-shadow: 0 0 30px rgba(168, 85, 247, 0.2);
-    }
-
-    .btn-ombre {
-      background: var(--ombre-grad);
-      color: black;
-      font-weight: 900;
-      text-transform: uppercase;
-      padding: 16px 32px;
-      border-radius: 12px;
-      transition: 0.3s ease;
-      box-shadow: 0 0 15px rgba(255, 45, 149, 0.3);
-      letter-spacing: 1px;
-    }
-
-    .btn-ombre:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
-    }
-
-    input {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: white;
-      padding: 12px;
-      border-radius: 8px;
-      width: 100%;
-      outline: none;
-      transition: 0.3s;
-    }
-
-    input:focus {
-      border-color: var(--neon-purple);
-      box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
-    }
-
-    .btn-plain {
-      border: 2px solid rgba(255,255,255,0.15);
-      color: white;
-      font-weight: 900;
-      text-transform: uppercase;
-      padding: 14px 20px;
-      border-radius: 12px;
-      transition: 0.3s ease;
-    }
-
-    .btn-plain:hover {
-      border-color: white;
-    }
-
-    @media print {
-      .no-print { display: none !important; }
-      body { background: white; color: black; }
-    }
-  </style>
-</head>
-<body class="p-6 md:p-12">
-  <nav class="mb-10 no-print">
-    <a href="index.html" class="font-bold text-sm tracking-widest uppercase hover:text-pink-400">
-      <span style="color: var(--neon-pink)">←</span> Back to Hub
-    </a>
-  </nav>
-
-  <header class="mb-12">
-    <h1 class="text-5xl md:text-7xl font-black mb-4 uppercase italic leading-tight">
-      Lab Trend <br><span class="text-gradient glow-pink">Visualizer™</span>
-    </h1>
-    <p class="text-gray-500 font-bold uppercase tracking-[0.2em] text-sm">
-      Organize pattern data into advocacy-ready receipts.
-    </p>
-  </header>
-
-  <div class="grid lg:grid-cols-3 gap-10">
-    <aside class="lg:col-span-1 no-print">
-      <div class="glass-card p-8">
-        <h2 class="text-2xl font-black mb-6 uppercase tracking-tight">Add Entry</h2>
-
-        <div class="space-y-5">
-          <div>
-            <label class="text-[10px] uppercase font-black text-gray-500 mb-1 block">Date</label>
-            <input type="date" id="labDate">
-          </div>
-
-          <div>
-            <label class="text-[10px] uppercase font-black text-gray-500 mb-1 block">Lab Name</label>
-            <input type="text" id="labName" placeholder="Ferritin">
-          </div>
-
-          <div>
-            <label class="text-[10px] uppercase font-black text-gray-500 mb-1 block">Result</label>
-            <input type="number" id="labResult" step="any" placeholder="0.00">
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="text-[10px] uppercase font-black text-gray-500 mb-1 block">Ref Low (Optional)</label>
-              <input type="number" id="refLow" step="any" placeholder="Optional">
-            </div>
-            <div>
-              <label class="text-[10px] uppercase font-black text-gray-500 mb-1 block">Ref High (Optional)</label>
-              <input type="number" id="refHigh" step="any" placeholder="Optional">
-            </div>
-          </div>
-
-          <button onclick="addEntry()" class="w-full btn-ombre mt-4">Analyze Trend</button>
-          <button onclick="loadDemoData()" class="w-full py-2 text-[10px] uppercase font-black text-gray-500 hover:text-white">
-            Load Demo Data
-          </button>
-          <button onclick="clearAll()" class="w-full py-2 text-[10px] uppercase font-black text-gray-500 hover:text-white">
-            Clear All
-          </button>
-        </div>
-      </div>
-    </aside>
-
-    <section class="lg:col-span-2 space-y-10">
-      <div class="glass-card p-8 min-h-[400px]">
-        <h3 class="text-sm font-black uppercase text-gray-500 mb-6 tracking-widest">Live Trend Projection</h3>
-        <canvas id="trendChart"></canvas>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div>
+        <label for="trendRefLow" style="display:block;margin-bottom:6px;font-weight:600;">Reference Low (optional)</label>
+        <input
+          id="trendRefLow"
+          type="number"
+          step="any"
+          placeholder="Example: 1.8"
+          style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(0,0,0,0.25);color:white;font-size:16px;outline:none;box-sizing:border-box;"
+        >
       </div>
 
-      <div id="summaryCard" class="hidden bg-white text-black p-10 rounded-none border-t-[12px] border-pink-500">
-        <div class="flex justify-between items-start border-b-2 border-black pb-6 mb-8">
-          <div>
-            <h2 class="text-4xl font-black uppercase italic leading-none">The Receipts</h2>
-            <p class="text-xs font-bold mt-2 uppercase tracking-widest">Unhinged N Loud™ Advocacy Tool</p>
-          </div>
-          <div class="text-[10px] font-bold text-right uppercase leading-tight">
-            Educational Data<br>Not Medical Advice
-          </div>
-        </div>
-
-        <div class="space-y-8">
-          <div id="statusAlert" class="py-4 px-6 text-2xl font-black italic uppercase"></div>
-
-          <div class="grid md:grid-cols-2 gap-8">
-            <div>
-              <h4 class="font-black text-xs uppercase border-b border-black mb-3 pb-2">Trend Summary</h4>
-              <p id="trendAnalysis" class="text-lg leading-snug"></p>
-            </div>
-
-            <div>
-              <h4 class="font-black text-xs uppercase border-b border-black mb-3 pb-2">Questions For My Doctor</h4>
-              <ul id="followUpList" class="text-sm italic space-y-2 list-none"></ul>
-            </div>
-          </div>
-
-          <div class="mt-12 no-print flex flex-col md:flex-row gap-4">
-            <button onclick="window.print()" class="bg-black text-white px-8 py-4 font-black uppercase">
-              Download PDF Receipt
-            </button>
-            <button onclick="location.reload()" class="btn-plain">
-              Start Over
-            </button>
-          </div>
-        </div>
+      <div>
+        <label for="trendRefHigh" style="display:block;margin-bottom:6px;font-weight:600;">Reference High (optional)</label>
+        <input
+          id="trendRefHigh"
+          type="number"
+          step="any"
+          placeholder="Example: 4.0"
+          style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(0,0,0,0.25);color:white;font-size:16px;outline:none;box-sizing:border-box;"
+        >
       </div>
-    </section>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button
+        id="renderTrendBtn"
+        type="button"
+        style="padding:14px 22px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,#ff4fd8,#9bff6b);color:#111;"
+      >
+        Visualize Trend
+      </button>
+
+      <button
+        id="clearTrendVisualizerBtn"
+        type="button"
+        style="padding:14px 22px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;background:rgba(255,255,255,0.12);color:white;"
+      >
+        Clear
+      </button>
+    </div>
+
+    <div
+      id="projectionSummary"
+      style="min-height:120px;padding:18px;border-radius:14px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.1);line-height:1.6;"
+    >
+      Your live trend projection will appear here.
+    </div>
+
+    <div
+      style="position:relative;width:100%;height:320px;min-height:320px;max-height:320px;padding:12px;border-radius:14px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.1);overflow:hidden;box-sizing:border-box;"
+    >
+      <canvas id="trendCanvas" height="280"></canvas>
+    </div>
   </div>
+</section>
 
-  <script>
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual';
+<script>
+(function () {
+  const valuesInput = document.getElementById("trendValues");
+  const refLowInput = document.getElementById("trendRefLow");
+  const refHighInput = document.getElementById("trendRefHigh");
+  const renderBtn = document.getElementById("renderTrendBtn");
+  const clearBtn = document.getElementById("clearTrendVisualizerBtn");
+  const summaryBox = document.getElementById("projectionSummary");
+  const canvas = document.getElementById("trendCanvas");
+
+  if (!valuesInput || !refLowInput || !refHighInput || !renderBtn || !clearBtn || !summaryBox || !canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  function parseValues(raw) {
+    return raw
+      .split(",")
+      .map(v => parseFloat(v.trim()))
+      .filter(v => !Number.isNaN(v));
+  }
+
+  function clampProjection(value) {
+    if (!Number.isFinite(value)) return 0;
+    return Number(value.toFixed(2));
+  }
+
+  function getTrendDirection(first, last) {
+    if (last > first) return "📈 Increasing";
+    if (last < first) return "📉 Decreasing";
+    return "➡️ Stable";
+  }
+
+  function getReferenceStatus(value, low, high) {
+    if (Number.isNaN(low) || Number.isNaN(high)) return "No reference range entered";
+    if (value < low) return "Below range";
+    if (value > high) return "Above range";
+    return "Within range";
+  }
+
+  function getProjectedNext(values) {
+    if (values.length < 2) return values[0] || 0;
+
+    let totalChange = 0;
+    for (let i = 1; i < values.length; i++) {
+      totalChange += values[i] - values[i - 1];
     }
 
-    let labEntries = [];
-    let chart = null;
+    const avgChange = totalChange / (values.length - 1);
+    return clampProjection(values[values.length - 1] + avgChange);
+  }
 
-    function addEntry() {
-      const rawLow = document.getElementById('refLow').value.trim();
-      const rawHigh = document.getElementById('refHigh').value.trim();
+  function clearCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
 
-      const entry = {
-        date: document.getElementById('labDate').value,
-        name: document.getElementById('labName').value.toUpperCase().trim(),
-        val: parseFloat(document.getElementById('labResult').value),
-        low: rawLow === "" ? NaN : parseFloat(rawLow),
-        high: rawHigh === "" ? NaN : parseFloat(rawHigh)
-      };
+    canvas.width = rect.width * dpr;
+    canvas.height = 280 * dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, rect.width, 280);
+  }
 
-      if (!entry.date || !entry.name || isNaN(entry.val)) {
-        alert("Please enter date, lab name, and result.");
-        return;
-      }
+  function drawChart(values, projected, refLow, refHigh) {
+    clearCanvas();
 
-      labEntries.push(entry);
-      labEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
-      renderAll();
+    const width = canvas.getBoundingClientRect().width;
+    const height = 280;
+    const padding = 30;
+
+    const allValues = [...values, projected];
+    if (!Number.isNaN(refLow)) allValues.push(refLow);
+    if (!Number.isNaN(refHigh)) allValues.push(refHigh);
+
+    const minVal = Math.min(...allValues);
+    const maxVal = Math.max(...allValues);
+    const range = maxVal - minVal || 1;
+
+    function xPos(index, total) {
+      if (total <= 1) return padding;
+      return padding + (index * (width - padding * 2)) / (total - 1);
     }
 
-    function loadDemoData() {
-      labEntries = [
-        { date: '2026-01-10', name: 'FERRITIN', val: 12, low: 30, high: 150 },
-        { date: '2026-02-15', name: 'FERRITIN', val: 9, low: 30, high: 150 },
-        { date: '2026-03-18', name: 'FERRITIN', val: 7, low: 30, high: 150 }
-      ];
-      renderAll();
+    function yPos(value) {
+      return padding + ((maxVal - value) / range) * (height - padding * 2);
     }
 
-    function clearAll() {
-      labEntries = [];
-      document.getElementById('labDate').value = "";
-      document.getElementById('labName').value = "";
-      document.getElementById('labResult').value = "";
-      document.getElementById('refLow').value = "";
-      document.getElementById('refHigh').value = "";
-      document.getElementById('summaryCard').classList.add('hidden');
-
-      if (chart) {
-        chart.destroy();
-        chart = null;
-      }
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(255,255,255,0.14)";
+    for (let i = 0; i < 5; i++) {
+      const y = padding + (i * (height - padding * 2)) / 4;
+      ctx.beginPath();
+      ctx.moveTo(padding, y);
+      ctx.lineTo(width - padding, y);
+      ctx.stroke();
     }
 
-    function renderAll() {
-      updateChart();
-      generateAdvocacySheet();
-      document.getElementById('summaryCard').classList.remove('hidden');
+    if (!Number.isNaN(refLow)) {
+      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.moveTo(padding, yPos(refLow));
+      ctx.lineTo(width - padding, yPos(refLow));
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
 
-    function updateChart() {
-      const ctx = document.getElementById('trendChart').getContext('2d');
-      if (chart) chart.destroy();
-
-      chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labEntries.map(e => e.date),
-          datasets: [{
-            label: labEntries[0].name,
-            data: labEntries.map(e => e.val),
-            borderColor: '#FF2D95',
-            borderWidth: 4,
-            backgroundColor: 'rgba(255, 45, 149, 0.1)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 6,
-            pointBackgroundColor: '#00E5FF'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              ticks: { color: '#888' },
-              grid: { color: 'rgba(255,255,255,0.05)' }
-            },
-            x: {
-              ticks: { color: '#888' },
-              grid: { display: false }
-            }
-          },
-          plugins: {
-            legend: { display: false }
-          }
-        }
-      });
+    if (!Number.isNaN(refHigh)) {
+      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.moveTo(padding, yPos(refHigh));
+      ctx.lineTo(width - padding, yPos(refHigh));
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
 
-    function generateAdvocacySheet() {
-      const last = labEntries[labEntries.length - 1];
-      const name = last.name;
-      const statusBox = document.getElementById('statusAlert');
-      const analysis = document.getElementById('trendAnalysis');
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#ff4fd8";
+    ctx.beginPath();
+    values.forEach((value, index) => {
+      const x = xPos(index, values.length + 1);
+      const y = yPos(value);
+      if (index === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
 
-      const hasRange = !isNaN(last.low) && !isNaN(last.high);
+    values.forEach((value, index) => {
+      const x = xPos(index, values.length + 1);
+      const y = yPos(value);
+      ctx.fillStyle = "#ff4fd8";
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    });
 
-      if (hasRange && (last.val > last.high || last.val < last.low)) {
-        statusBox.innerText = `Out of Range: ${name}`;
-        statusBox.style.background = '#000';
-        statusBox.style.color = '#FF2D95';
-      } else if (hasRange) {
-        statusBox.innerText = `Within Range: ${name}`;
-        statusBox.style.background = '#f4f4f4';
-        statusBox.style.color = '#000';
-      } else {
-        statusBox.innerText = `Trend Logged: ${name}`;
-        statusBox.style.background = '#f4f4f4';
-        statusBox.style.color = '#000';
-      }
+    const projectedIndex = values.length;
+    const projectedX = xPos(projectedIndex, values.length + 1);
+    const projectedY = yPos(projected);
 
-      let direction = "stable";
-      if (labEntries.length > 1) {
-        const prev = labEntries[labEntries.length - 2].val;
-        direction = last.val > prev ? "trending upward" : last.val < prev ? "trending downward" : "stable";
-      }
+    const lastX = xPos(values.length - 1, values.length + 1);
+    const lastY = yPos(values[values.length - 1]);
 
-      if (hasRange) {
-        analysis.innerText =
-          `The most recent ${name} value is ${last.val}. Over the last ${labEntries.length} tests, the data is ${direction}. This result was compared against the reference range of ${last.low} to ${last.high}. This visualization is provided to support clinical dialogue regarding symptom correlation.`;
-      } else {
-        analysis.innerText =
-          `The most recent ${name} value is ${last.val}. Over the last ${labEntries.length} tests, the data is ${direction}. No reference range was entered for this result, so this visualization is focused on directional pattern tracking and clinical dialogue support.`;
-      }
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#9bff6b";
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(projectedX, projectedY);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
-      document.getElementById('followUpList').innerHTML = `
-        <li>• "Given this ${direction}, should we adjust my dosage?"</li>
-        <li>• "Does this shift explain the increase in my clinical symptoms?"</li>
-        <li>• "What is the next objective step if this trend continues?"</li>
-      `;
+    ctx.fillStyle = "#9bff6b";
+    ctx.beginPath();
+    ctx.arc(projectedX, projectedY, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "center";
+
+    values.forEach((_, index) => {
+      const x = xPos(index, values.length + 1);
+      ctx.fillText("L" + (index + 1), x, height - 8);
+    });
+
+    ctx.fillText("Next", projectedX, height - 8);
+  }
+
+  function renderTrendProjection() {
+    const raw = valuesInput.value.trim();
+    const refLow = parseFloat(refLowInput.value);
+    const refHigh = parseFloat(refHighInput.value);
+
+    if (!raw) {
+      summaryBox.innerHTML = "⚠️ Please enter lab values separated by commas.";
+      clearCanvas();
+      return;
     }
-  </script>
-</body>
-</html>
+
+    const values = parseValues(raw);
+
+    if (values.length < 2) {
+      summaryBox.innerHTML = "⚠️ Please enter at least 2 valid values for the live projection.";
+      clearCanvas();
+      return;
+    }
+
+    const first = values[0];
+    const last = values[values.length - 1];
+    const projected = getProjectedNext(values);
+    const trend = getTrendDirection(first, last);
+    const currentStatus = getReferenceStatus(last, refLow, refHigh);
+    const projectedStatus = getReferenceStatus(projected, refLow, refHigh);
+
+    summaryBox.innerHTML = `
+      <div style="font-size:20px;font-weight:700;margin-bottom:10px;">${trend}</div>
+      <div><strong>Current Latest Value:</strong> ${last}</div>
+      <div><strong>Projected Next Value:</strong> ${projected}</div>
+      <div><strong>Current Range Status:</strong> ${currentStatus}</div>
+      <div><strong>Projected Range Status:</strong> ${projectedStatus}</div>
+      <div><strong>Interpretation:</strong> This is a simple directional projection based on the average change between entered values. It is for tracking patterns only, not diagnosis.</div>
+    `;
+
+    drawChart(values, projected, refLow, refHigh);
+  }
+
+  function clearVisualizer() {
+    valuesInput.value = "";
+    refLowInput.value = "";
+    refHighInput.value = "";
+    summaryBox.innerHTML = "Your live trend projection will appear here.";
+    clearCanvas();
+  }
+
+  renderBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    renderTrendProjection();
+  });
+
+  clearBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    clearVisualizer();
+  });
+
+  clearCanvas();
+})();
+</script>
