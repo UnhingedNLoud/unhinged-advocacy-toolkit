@@ -1,6 +1,6 @@
 <section id="lab-trend-visualizer" style="max-width:900px;margin:40px auto;padding:24px;border-radius:20px;background:rgba(255,255,255,0.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.12);color:white;">
   <h2 style="margin-top:0;font-size:28px;">Lab Trend Visualizer</h2>
-  <p style="opacity:0.9;">Enter lab values to see the trend and a simple live projection.</p>
+  <p style="opacity:0.9;">Enter your lab values to see whether they are increasing, decreasing, or staying stable.</p>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
     <label for="trendValues" style="font-weight:600;">Lab Values</label>
@@ -41,7 +41,7 @@
         type="button"
         style="padding:14px 22px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,#ff4fd8,#9bff6b);color:#111;"
       >
-        Visualize Trend
+        Track Trend
       </button>
 
       <button
@@ -54,10 +54,10 @@
     </div>
 
     <div
-      id="projectionSummary"
-      style="min-height:120px;padding:18px;border-radius:14px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.1);line-height:1.6;"
+      id="trendSummary"
+      style="min-height:140px;padding:18px;border-radius:14px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.1);line-height:1.6;"
     >
-      Your live trend projection will appear here.
+      Your lab trend summary will appear here.
     </div>
 
     <div
@@ -75,7 +75,7 @@
   const refHighInput = document.getElementById("trendRefHigh");
   const renderBtn = document.getElementById("renderTrendBtn");
   const clearBtn = document.getElementById("clearTrendVisualizerBtn");
-  const summaryBox = document.getElementById("projectionSummary");
+  const summaryBox = document.getElementById("trendSummary");
   const canvas = document.getElementById("trendCanvas");
 
   if (!valuesInput || !refLowInput || !refHighInput || !renderBtn || !clearBtn || !summaryBox || !canvas) return;
@@ -87,11 +87,6 @@
       .split(",")
       .map(v => parseFloat(v.trim()))
       .filter(v => !Number.isNaN(v));
-  }
-
-  function clampProjection(value) {
-    if (!Number.isFinite(value)) return 0;
-    return Number(value.toFixed(2));
   }
 
   function getTrendDirection(first, last) {
@@ -107,37 +102,22 @@
     return "Within range";
   }
 
-  function getProjectedNext(values) {
-    if (values.length < 2) return values[0] || 0;
-
-    let totalChange = 0;
-    for (let i = 1; i < values.length; i++) {
-      totalChange += values[i] - values[i - 1];
-    }
-
-    const avgChange = totalChange / (values.length - 1);
-    return clampProjection(values[values.length - 1] + avgChange);
-  }
-
-  function clearCanvas() {
+  function prepareCanvas() {
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-
     canvas.width = rect.width * dpr;
     canvas.height = 280 * dpr;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, rect.width, 280);
+    return { width: rect.width, height: 280 };
   }
 
-  function drawChart(values, projected, refLow, refHigh) {
-    clearCanvas();
-
-    const width = canvas.getBoundingClientRect().width;
-    const height = 280;
+  function drawTrend(values, refLow, refHigh) {
+    const { width, height } = prepareCanvas();
     const padding = 30;
 
-    const allValues = [...values, projected];
+    const allValues = [...values];
     if (!Number.isNaN(refLow)) allValues.push(refLow);
     if (!Number.isNaN(refHigh)) allValues.push(refHigh);
 
@@ -146,7 +126,7 @@
     const range = maxVal - minVal || 1;
 
     function xPos(index, total) {
-      if (total <= 1) return padding;
+      if (total <= 1) return width / 2;
       return padding + (index * (width - padding * 2)) / (total - 1);
     }
 
@@ -188,7 +168,7 @@
     ctx.strokeStyle = "#ff4fd8";
     ctx.beginPath();
     values.forEach((value, index) => {
-      const x = xPos(index, values.length + 1);
+      const x = xPos(index, values.length);
       const y = yPos(value);
       if (index === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
@@ -196,7 +176,7 @@
     ctx.stroke();
 
     values.forEach((value, index) => {
-      const x = xPos(index, values.length + 1);
+      const x = xPos(index, values.length);
       const y = yPos(value);
       ctx.fillStyle = "#ff4fd8";
       ctx.beginPath();
@@ -204,95 +184,86 @@
       ctx.fill();
     });
 
-    const projectedIndex = values.length;
-    const projectedX = xPos(projectedIndex, values.length + 1);
-    const projectedY = yPos(projected);
-
-    const lastX = xPos(values.length - 1, values.length + 1);
-    const lastY = yPos(values[values.length - 1]);
-
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "#9bff6b";
-    ctx.setLineDash([8, 6]);
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(projectedX, projectedY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.fillStyle = "#9bff6b";
-    ctx.beginPath();
-    ctx.arc(projectedX, projectedY, 5, 0, Math.PI * 2);
-    ctx.fill();
-
     ctx.fillStyle = "rgba(255,255,255,0.9)";
     ctx.font = "12px Arial";
     ctx.textAlign = "center";
 
     values.forEach((_, index) => {
-      const x = xPos(index, values.length + 1);
+      const x = xPos(index, values.length);
       ctx.fillText("L" + (index + 1), x, height - 8);
     });
-
-    ctx.fillText("Next", projectedX, height - 8);
   }
 
-  function renderTrendProjection() {
+  function renderTrend() {
     const raw = valuesInput.value.trim();
     const refLow = parseFloat(refLowInput.value);
     const refHigh = parseFloat(refHighInput.value);
 
     if (!raw) {
       summaryBox.innerHTML = "⚠️ Please enter lab values separated by commas.";
-      clearCanvas();
+      prepareCanvas();
       return;
     }
 
     const values = parseValues(raw);
 
     if (values.length < 2) {
-      summaryBox.innerHTML = "⚠️ Please enter at least 2 valid values for the live projection.";
-      clearCanvas();
+      summaryBox.innerHTML = "⚠️ Please enter at least 2 valid lab values.";
+      prepareCanvas();
       return;
     }
 
     const first = values[0];
     const last = values[values.length - 1];
-    const projected = getProjectedNext(values);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
     const trend = getTrendDirection(first, last);
-    const currentStatus = getReferenceStatus(last, refLow, refHigh);
-    const projectedStatus = getReferenceStatus(projected, refLow, refHigh);
+    const status = getReferenceStatus(last, refLow, refHigh);
 
     summaryBox.innerHTML = `
       <div style="font-size:20px;font-weight:700;margin-bottom:10px;">${trend}</div>
-      <div><strong>Current Latest Value:</strong> ${last}</div>
-      <div><strong>Projected Next Value:</strong> ${projected}</div>
-      <div><strong>Current Range Status:</strong> ${currentStatus}</div>
-      <div><strong>Projected Range Status:</strong> ${projectedStatus}</div>
-      <div><strong>Interpretation:</strong> This is a simple directional projection based on the average change between entered values. It is for tracking patterns only, not diagnosis.</div>
+      <div><strong>Values Entered:</strong> ${values.join(", ")}</div>
+      <div><strong>First Value:</strong> ${first}</div>
+      <div><strong>Latest Value:</strong> ${last}</div>
+      <div><strong>Lowest Value:</strong> ${min}</div>
+      <div><strong>Highest Value:</strong> ${max}</div>
+      <div><strong>Latest Reference Status:</strong> ${status}</div>
     `;
 
-    drawChart(values, projected, refLow, refHigh);
+    drawTrend(values, refLow, refHigh);
   }
 
-  function clearVisualizer() {
+  function clearTrend() {
     valuesInput.value = "";
     refLowInput.value = "";
     refHighInput.value = "";
-    summaryBox.innerHTML = "Your live trend projection will appear here.";
-    clearCanvas();
+    summaryBox.innerHTML = "Your lab trend summary will appear here.";
+    prepareCanvas();
   }
 
   renderBtn.addEventListener("click", function (event) {
     event.preventDefault();
-    renderTrendProjection();
+    renderTrend();
   });
 
   clearBtn.addEventListener("click", function (event) {
     event.preventDefault();
-    clearVisualizer();
+    clearTrend();
   });
 
-  clearCanvas();
+  window.addEventListener("resize", function () {
+    const raw = valuesInput.value.trim();
+    const values = parseValues(raw);
+    const refLow = parseFloat(refLowInput.value);
+    const refHigh = parseFloat(refHighInput.value);
+
+    if (values.length >= 2) {
+      drawTrend(values, refLow, refHigh);
+    } else {
+      prepareCanvas();
+    }
+  });
+
+  prepareCanvas();
 })();
 </script>
