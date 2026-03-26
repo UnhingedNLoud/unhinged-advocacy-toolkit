@@ -1,133 +1,1090 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNL™ Health Analyzer | Unhinged N Loud™</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNL™ Health Analyzer Pro | Unhinged N Loud™</title>
+  <meta
+    name="description"
+    content="Analyze lab values, connect symptoms, track trends, and create a doctor-ready summary with the UNL™ Health Analyzer Pro."
+  />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<style>
-body {
-  background: #000;
-  color: white;
-  font-family: Arial;
-  padding: 20px;
-}
+  <style>
+    :root {
+      --bg: #030303;
+      --panel: #0b0b10;
+      --panel2: #12121a;
+      --text: #f7f7fb;
+      --muted: #a8a8b8;
+      --border: rgba(255,255,255,0.09);
+      --cyan: #00eaff;
+      --green: #39ff14;
+      --pink: #ff4fd8;
+      --purple: #9a5cff;
+      --yellow: #ffe85a;
+      --red: #ff5e7c;
+      --orange: #ffb84d;
+      --ok: #52ff9c;
+      --shadow-cyan: 0 0 22px rgba(0,234,255,0.22);
+      --shadow-green: 0 0 22px rgba(57,255,20,0.18);
+      --shadow-pink: 0 0 22px rgba(255,79,216,0.18);
+      --radius: 20px;
+    }
 
-h1 {
-  color: #00eaff;
-  font-size: 40px;
-}
+    * { box-sizing: border-box; }
 
-input, textarea {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  background: #111;
-  color: white;
-  border: 1px solid #333;
-  border-radius: 8px;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at top left, rgba(0,234,255,0.08), transparent 24%),
+        radial-gradient(circle at top right, rgba(57,255,20,0.06), transparent 22%),
+        radial-gradient(circle at bottom center, rgba(255,79,216,0.06), transparent 22%),
+        linear-gradient(180deg, #010101 0%, #050507 100%);
+      color: var(--text);
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      min-height: 100%;
+    }
 
-button {
-  padding: 14px;
-  width: 100%;
-  margin-top: 10px;
-  background: linear-gradient(90deg,#ff00cc,#00eaff);
-  border: none;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-}
+    .wrap {
+      width: min(1100px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 18px 0 50px;
+    }
 
-.section {
-  margin-top: 30px;
-}
+    .hero {
+      padding: 22px 18px;
+      border-radius: 26px;
+      border: 1px solid rgba(0,234,255,0.18);
+      background: linear-gradient(180deg, rgba(0,234,255,0.05), rgba(255,255,255,0.015));
+      box-shadow: var(--shadow-cyan);
+      margin-bottom: 16px;
+    }
 
-.hidden {
-  display: none;
-}
-</style>
+    .eyebrow {
+      display: inline-block;
+      color: var(--green);
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2rem, 7vw, 4.5rem);
+      line-height: .95;
+      font-weight: 900;
+      font-style: italic;
+      color: var(--cyan);
+      text-shadow: 0 0 18px rgba(0,234,255,0.35);
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      max-width: 850px;
+      line-height: 1.6;
+    }
+
+    .hero .lead {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .hero .sub {
+      color: var(--muted);
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .panel.cyan { box-shadow: var(--shadow-cyan); border-color: rgba(0,234,255,0.26); }
+    .panel.green { box-shadow: var(--shadow-green); border-color: rgba(57,255,20,0.24); }
+    .panel.pink { box-shadow: var(--shadow-pink); border-color: rgba(255,79,216,0.22); }
+
+    .step {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      background: rgba(255,255,255,0.05);
+      color: var(--yellow);
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #dddded;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #08080d;
+      color: white;
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-size: 16px;
+      outline: none;
+      transition: .18s ease;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #828298;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0,234,255,0.1);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+
+    button:hover { opacity: .96; }
+    button:active { transform: translateY(1px); }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--pink), var(--purple), var(--cyan));
+      color: #06070a;
+      box-shadow: 0 0 18px rgba(155,92,255,0.24);
+    }
+
+    .btn-green {
+      background: linear-gradient(90deg, #baff48, var(--green));
+      color: #081005;
+      box-shadow: 0 0 18px rgba(57,255,20,0.24);
+    }
+
+    .btn-dark {
+      background: #101018;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .hidden { display: none !important; }
+
+    .alert {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,79,216,0.25);
+      background: rgba(255,79,216,0.08);
+      line-height: 1.5;
+    }
+
+    .result-card {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .high { background: var(--red); color: #17070c; }
+    .low { background: var(--orange); color: #181104; }
+    .inrange { background: var(--ok); color: #03120a; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .stat {
+      background: #08080d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .stat .k {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
+
+    .stat .v {
+      font-size: 1.1rem;
+      font-weight: 900;
+    }
+
+    .box {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      line-height: 1.6;
+      background: rgba(0,234,255,0.06);
+      border: 1px solid rgba(0,234,255,0.2);
+    }
+
+    .checklist {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #08080d;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .checklist-item input[type="checkbox"] {
+      width: auto;
+      transform: scale(1.1);
+    }
+
+    .canvas-wrap {
+      margin-top: 14px;
+      background: #06070a;
+      border: 1px solid rgba(57,255,20,0.22);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: var(--shadow-green);
+    }
+
+    canvas {
+      width: 100%;
+      height: 240px;
+      display: block;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0));
+    }
+
+    .entry-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .entry-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #08080d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .entry-item small {
+      color: var(--muted);
+      display: block;
+      margin-top: 4px;
+    }
+
+    .report-preview {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      background: #08080d;
+      border: 1px solid rgba(255,255,255,0.08);
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+
+    .tiny {
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .grid.two, .grid.three, .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .wrap {
+        width: min(100% - 16px, 1100px);
+        padding-top: 12px;
+      }
+
+      .hero, .panel {
+        padding: 16px;
+      }
+
+      canvas {
+        height: 210px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Unhinged N Loud™</div>
+      <h1>UNL™ HEALTH ANALYZER PRO</h1>
+      <p class="lead">One tool. One flow. Labs + symptoms + trends + doctor summary.</p>
+      <p class="sub">
+        This version is built to feel like a real product instead of multiple confusing tools.
+      </p>
+    </section>
 
-<h1>UNL™ Health Analyzer</h1>
-<p>Your symptoms aren’t random. Let’s connect the dots.</p>
+    <section class="panel cyan">
+      <div class="step">Step 1 · Lab + symptom input</div>
+      <h2>Enter Your Information</h2>
+      <p class="muted">
+        Start with one lab result, then add symptoms and optional context.
+      </p>
 
-<!-- STEP 1 -->
-<div class="section">
-<h2>Step 1: Lab Info</h2>
+      <div class="grid two">
+        <div>
+          <label for="labName">Lab Name</label>
+          <input id="labName" type="text" placeholder="Example: CRP, ESR, TSH, Ferritin" />
+        </div>
+        <div>
+          <label for="labDate">Lab Date</label>
+          <input id="labDate" type="date" />
+        </div>
+      </div>
 
-<input id="labName" placeholder="Lab Name (CRP, TSH)">
-<input id="labResult" placeholder="Your Result">
-<input id="low" placeholder="Reference Low">
-<input id="high" placeholder="Reference High">
+      <div class="grid three">
+        <div>
+          <label for="labResult">Your Result</label>
+          <input id="labResult" type="number" step="any" placeholder="Example: 12.5" />
+        </div>
+        <div>
+          <label for="refLow">Reference Low</label>
+          <input id="refLow" type="number" step="any" placeholder="Example: 0" />
+        </div>
+        <div>
+          <label for="refHigh">Reference High</label>
+          <input id="refHigh" type="number" step="any" placeholder="Example: 10" />
+        </div>
+      </div>
 
-</div>
+      <div class="grid two">
+        <div>
+          <label for="symptomsText">Symptoms / Notes</label>
+          <textarea id="symptomsText" placeholder="Example: fatigue, brain fog, joint pain, headaches, swelling, digestive issues"></textarea>
+        </div>
+        <div>
+          <label for="contextText">Context / Pattern Notes</label>
+          <textarea id="contextText" placeholder="Example: symptoms worsening over time, repeat abnormal labs, flare before cycle, post-infection changes"></textarea>
+        </div>
+      </div>
 
-<!-- STEP 2 -->
-<div class="section">
-<h2>Step 2: Symptoms</h2>
+      <div class="checklist">
+        <label style="margin-bottom:0;">Quick Symptom Checklist</label>
+        <div class="checklist-item"><input type="checkbox" value="Fatigue" class="symptomCheck"> <span>Fatigue</span></div>
+        <div class="checklist-item"><input type="checkbox" value="Brain fog" class="symptomCheck"> <span>Brain fog</span></div>
+        <div class="checklist-item"><input type="checkbox" value="Joint pain" class="symptomCheck"> <span>Joint pain</span></div>
+        <div class="checklist-item"><input type="checkbox" value="Digestive symptoms" class="symptomCheck"> <span>Digestive symptoms</span></div>
+        <div class="checklist-item"><input type="checkbox" value="Hair loss" class="symptomCheck"> <span>Hair loss</span></div>
+        <div class="checklist-item"><input type="checkbox" value="Headaches" class="symptomCheck"> <span>Headaches</span></div>
+      </div>
 
-<textarea id="symptoms" placeholder="Fatigue, brain fog, joint pain..."></textarea>
+      <div class="btn-row">
+        <button class="btn-primary" id="analyzeBtn">Analyze My Health</button>
+        <button class="btn-dark" id="clearBtn" type="button">Clear</button>
+      </div>
 
-</div>
+      <div id="mainError" class="alert hidden"></div>
 
-<!-- BUTTON -->
-<button onclick="analyze()">Analyze My Health</button>
+      <div id="resultCard" class="result-card hidden">
+        <div id="statusPill" class="status-pill">Status</div>
+        <h3 id="resultTitle" style="margin:0 0 8px;font-size:1.35rem;">Your Result</h3>
+        <div id="resultSummary" class="muted"></div>
 
-<!-- RESULTS -->
-<div id="results" class="section hidden">
-<h2>Results</h2>
-<p id="status"></p>
-<p id="explanation"></p>
+        <div class="stats">
+          <div class="stat">
+            <div class="k">Lab</div>
+            <div class="v" id="statLab">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Your Result</div>
+            <div class="v" id="statResult">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Reference Range</div>
+            <div class="v" id="statRange">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Status</div>
+            <div class="v" id="statStatus">—</div>
+          </div>
+        </div>
 
-<button onclick="downloadPDF()">Download Doctor Report</button>
-</div>
+        <div id="doctorLanguage" class="box"></div>
+        <div id="advocacyLanguage" class="box"></div>
 
-<script>
+        <div class="btn-row">
+          <button class="btn-green" id="openTrendBtn" type="button">Track This Lab Over Time</button>
+          <button class="btn-primary" id="openReportBtn" type="button">Create Doctor Summary</button>
+        </div>
+      </div>
+    </section>
 
-let reportText = "";
+    <section class="panel green hidden" id="trendSection">
+      <div class="step">Step 2 · Optional trend tracking</div>
+      <h2>Track This Lab Over Time</h2>
+      <p class="muted">Add more entries to visualize whether this lab is moving up, down, or staying unstable.</p>
 
-function analyze() {
+      <div class="grid three">
+        <div>
+          <label for="trendDate">Entry Date</label>
+          <input id="trendDate" type="date" />
+        </div>
+        <div>
+          <label for="trendValue">Lab Value</label>
+          <input id="trendValue" type="number" step="any" placeholder="Example: 8.2" />
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button class="btn-primary" id="addTrendBtn" type="button" style="width:100%;">Add Trend Entry</button>
+        </div>
+      </div>
 
-let lab = document.getElementById("labName").value;
-let result = parseFloat(document.getElementById("labResult").value);
-let low = parseFloat(document.getElementById("low").value);
-let high = parseFloat(document.getElementById("high").value);
-let symptoms = document.getElementById("symptoms").value;
+      <div class="canvas-wrap">
+        <canvas id="trendCanvas" width="1000" height="240"></canvas>
+      </div>
 
-let status = "";
-if (result < low) status = "LOW";
-else if (result > high) status = "HIGH";
-else status = "IN RANGE";
+      <div id="entryList" class="entry-list"></div>
 
-let explanation = "Your " + lab + " is " + status + ".\n\n";
+      <div class="btn-row">
+        <button class="btn-dark" id="clearTrendBtn" type="button">Clear Trend Data</button>
+      </div>
+    </section>
 
-explanation += "Symptoms reported: " + symptoms + "\n\n";
+    <section class="panel pink hidden" id="reportSection">
+      <div class="step">Step 3 · Doctor-ready summary</div>
+      <h2>Generate Your Report</h2>
+      <p class="muted">This is the polished end step. Add your name and email, preview the summary, then download the PDF.</p>
 
-explanation += "This pattern may indicate underlying imbalance and should be discussed with your provider.";
+      <div class="grid two">
+        <div>
+          <label for="patientName">Your Name</label>
+          <input id="patientName" type="text" placeholder="Your name" />
+        </div>
+        <div>
+          <label for="patientEmail">Email</label>
+          <input id="patientEmail" type="email" placeholder="you@example.com" />
+        </div>
+      </div>
 
-document.getElementById("status").innerText = explanation;
-document.getElementById("results").classList.remove("hidden");
+      <div class="btn-row">
+        <button class="btn-primary" id="generateBtn" type="button">Generate Summary</button>
+        <button class="btn-green" id="downloadBtn" type="button">Download Doctor Summary PDF</button>
+      </div>
 
-reportText = explanation;
+      <div class="tiny" id="emailNotice">Enter an email if you want it included on the report. This version does not send email automatically.</div>
 
-}
+      <div id="reportPreview" class="report-preview hidden"></div>
+    </section>
+  </div>
 
-function downloadPDF() {
+  <script>
+    const { jsPDF } = window.jspdf;
 
-const { jsPDF } = window.jspdf;
-let doc = new jsPDF();
+    const state = {
+      labName: "",
+      labDate: "",
+      result: null,
+      low: null,
+      high: null,
+      status: "",
+      symptoms: "",
+      context: "",
+      quickSymptoms: [],
+      doctorLine: "",
+      advocacyLine: "",
+      summaryLine: "",
+      trendEntries: []
+    };
 
-doc.text(reportText, 10, 10);
-doc.save("UNL_Report.pdf");
+    const el = {
+      labName: document.getElementById("labName"),
+      labDate: document.getElementById("labDate"),
+      labResult: document.getElementById("labResult"),
+      refLow: document.getElementById("refLow"),
+      refHigh: document.getElementById("refHigh"),
+      symptomsText: document.getElementById("symptomsText"),
+      contextText: document.getElementById("contextText"),
+      analyzeBtn: document.getElementById("analyzeBtn"),
+      clearBtn: document.getElementById("clearBtn"),
+      mainError: document.getElementById("mainError"),
+      resultCard: document.getElementById("resultCard"),
+      statusPill: document.getElementById("statusPill"),
+      resultTitle: document.getElementById("resultTitle"),
+      resultSummary: document.getElementById("resultSummary"),
+      statLab: document.getElementById("statLab"),
+      statResult: document.getElementById("statResult"),
+      statRange: document.getElementById("statRange"),
+      statStatus: document.getElementById("statStatus"),
+      doctorLanguage: document.getElementById("doctorLanguage"),
+      advocacyLanguage: document.getElementById("advocacyLanguage"),
+      openTrendBtn: document.getElementById("openTrendBtn"),
+      openReportBtn: document.getElementById("openReportBtn"),
 
-}
+      trendSection: document.getElementById("trendSection"),
+      trendDate: document.getElementById("trendDate"),
+      trendValue: document.getElementById("trendValue"),
+      addTrendBtn: document.getElementById("addTrendBtn"),
+      clearTrendBtn: document.getElementById("clearTrendBtn"),
+      trendCanvas: document.getElementById("trendCanvas"),
+      entryList: document.getElementById("entryList"),
 
-</script>
+      reportSection: document.getElementById("reportSection"),
+      patientName: document.getElementById("patientName"),
+      patientEmail: document.getElementById("patientEmail"),
+      generateBtn: document.getElementById("generateBtn"),
+      downloadBtn: document.getElementById("downloadBtn"),
+      reportPreview: document.getElementById("reportPreview"),
+      emailNotice: document.getElementById("emailNotice")
+    };
 
+    function trackEvent(name, params = {}) {
+      try {
+        if (typeof gtag === "function") {
+          gtag("event", name, params);
+        }
+      } catch (e) {
+        console.log("analytics skipped", name);
+      }
+    }
+
+    function showError(msg) {
+      el.mainError.textContent = msg;
+      el.mainError.classList.remove("hidden");
+    }
+
+    function hideError() {
+      el.mainError.textContent = "";
+      el.mainError.classList.add("hidden");
+    }
+
+    function toNum(v) {
+      return Number(v);
+    }
+
+    function getCheckedSymptoms() {
+      return [...document.querySelectorAll(".symptomCheck:checked")].map(cb => cb.value);
+    }
+
+    function mergeSymptoms() {
+      const typed = el.symptomsText.value.trim();
+      const checks = getCheckedSymptoms();
+      if (typed && checks.length) return typed + ", " + checks.join(", ");
+      if (typed) return typed;
+      if (checks.length) return checks.join(", ");
+      return "";
+    }
+
+    function getStatus(result, low, high) {
+      if (result < low) return "LOW";
+      if (result > high) return "HIGH";
+      return "IN RANGE";
+    }
+
+    function statusClass(status) {
+      if (status === "HIGH") return "high";
+      if (status === "LOW") return "low";
+      return "inrange";
+    }
+
+    function getSummaryText(labName, status, symptoms) {
+      const symptomText = symptoms ? ` Reported symptoms: ${symptoms}.` : "";
+      if (status === "HIGH") {
+        return `Your ${labName} is above the reference range you entered.${symptomText} One abnormal value alone does not diagnose the cause, but it may support a deeper conversation about inflammation, thyroid patterns, nutrient issues, immune activity, or follow-up testing depending on the lab.`;
+      }
+      if (status === "LOW") {
+        return `Your ${labName} is below the reference range you entered.${symptomText} This does not diagnose the cause by itself, but it may be important when reviewed alongside symptoms, history, repeat labs, and trend changes over time.`;
+      }
+      return `Your ${labName} is within the reference range you entered.${symptomText} In-range does not always mean nothing is wrong, especially when symptoms and repeat patterns are still present.`;
+    }
+
+    function getDoctorLanguage(labName, result, low, high, status) {
+      if (status === "HIGH") {
+        return `<strong>Doctor-language summary:</strong><br>${labName} is elevated at ${result} compared with the provided reference range of ${low} to ${high}. Clinical significance depends on symptoms, timing, repeat trends, and the rest of the patient picture.`;
+      }
+      if (status === "LOW") {
+        return `<strong>Doctor-language summary:</strong><br>${labName} is low at ${result} compared with the provided reference range of ${low} to ${high}. Clinical significance depends on symptoms, timing, repeat trends, and the rest of the patient picture.`;
+      }
+      return `<strong>Doctor-language summary:</strong><br>${labName} is currently within the provided reference range at ${result} (${low} to ${high}), though symptoms and trend history may still justify further discussion or repeat testing.`;
+    }
+
+    function getAdvocacyLanguage(symptoms, context, status) {
+      const symptomLine = symptoms ? `Symptoms reported: ${symptoms}. ` : "";
+      const contextLine = context ? `Context/pattern notes: ${context}. ` : "";
+      return `<strong>Advocacy note:</strong><br>${symptomLine}${contextLine}Even when a lab is ${status.toLowerCase()}, symptoms and repeated patterns still matter. This summary can help organize concerns clearly for a medical visit.`;
+    }
+
+    function analyze() {
+      hideError();
+
+      const labName = el.labName.value.trim();
+      const labDate = el.labDate.value || new Date().toISOString().split("T")[0];
+      const result = toNum(el.labResult.value);
+      const low = toNum(el.refLow.value);
+      const high = toNum(el.refHigh.value);
+      const symptoms = mergeSymptoms();
+      const context = el.contextText.value.trim();
+
+      if (!labName) return showError("Please enter the lab name.");
+      if (Number.isNaN(result)) return showError("Please enter your lab result.");
+      if (Number.isNaN(low) || Number.isNaN(high)) return showError("Please enter both reference range values.");
+      if (high <= low) return showError("Reference high must be greater than reference low.");
+
+      const status = getStatus(result, low, high);
+      const summaryLine = getSummaryText(labName, status, symptoms);
+      const doctorLine = getDoctorLanguage(labName, result, low, high, status);
+      const advocacyLine = getAdvocacyLanguage(symptoms, context, status);
+
+      state.labName = labName;
+      state.labDate = labDate;
+      state.result = result;
+      state.low = low;
+      state.high = high;
+      state.status = status;
+      state.symptoms = symptoms;
+      state.context = context;
+      state.quickSymptoms = getCheckedSymptoms();
+      state.summaryLine = summaryLine;
+      state.doctorLine = doctorLine;
+      state.advocacyLine = advocacyLine;
+
+      el.resultCard.classList.remove("hidden");
+      el.statusPill.className = "status-pill " + statusClass(status);
+      el.statusPill.textContent = status;
+      el.resultTitle.textContent = `${labName} is ${status}`;
+      el.resultSummary.textContent = summaryLine;
+      el.statLab.textContent = labName;
+      el.statResult.textContent = result;
+      el.statRange.textContent = `${low} – ${high}`;
+      el.statStatus.textContent = status;
+      el.doctorLanguage.innerHTML = doctorLine;
+      el.advocacyLanguage.innerHTML = advocacyLine;
+
+      if (state.trendEntries.length === 0) {
+        state.trendEntries.push({ date: labDate, value: result });
+      }
+
+      renderEntries();
+      drawTrend();
+
+      trackEvent("unl_health_analyzed", { lab_name: labName, status });
+    }
+
+    function clearAll() {
+      el.labName.value = "";
+      el.labDate.value = new Date().toISOString().split("T")[0];
+      el.labResult.value = "";
+      el.refLow.value = "";
+      el.refHigh.value = "";
+      el.symptomsText.value = "";
+      el.contextText.value = "";
+      document.querySelectorAll(".symptomCheck").forEach(cb => cb.checked = false);
+
+      state.labName = "";
+      state.labDate = "";
+      state.result = null;
+      state.low = null;
+      state.high = null;
+      state.status = "";
+      state.symptoms = "";
+      state.context = "";
+      state.quickSymptoms = [];
+      state.summaryLine = "";
+      state.doctorLine = "";
+      state.advocacyLine = "";
+      state.trendEntries = [];
+
+      el.resultCard.classList.add("hidden");
+      el.trendSection.classList.add("hidden");
+      el.reportSection.classList.add("hidden");
+      el.reportPreview.classList.add("hidden");
+      el.reportPreview.textContent = "";
+      hideError();
+      renderEntries();
+      drawTrend();
+    }
+
+    function openTrend() {
+      if (!state.labName) return showError("Analyze a lab first.");
+      el.trendSection.classList.remove("hidden");
+      el.trendDate.value = new Date().toISOString().split("T")[0];
+      el.trendValue.value = "";
+      el.trendSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      trackEvent("unl_trend_opened", { lab_name: state.labName });
+    }
+
+    function openReport() {
+      if (!state.labName) return showError("Analyze a lab first.");
+      el.reportSection.classList.remove("hidden");
+      el.reportSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      trackEvent("unl_report_opened", { lab_name: state.labName });
+    }
+
+    function addTrend() {
+      const date = el.trendDate.value;
+      const value = toNum(el.trendValue.value);
+
+      if (!date) return alert("Please choose a date.");
+      if (Number.isNaN(value)) return alert("Please enter a lab value.");
+
+      state.trendEntries.push({ date, value });
+      state.trendEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      el.trendValue.value = "";
+      renderEntries();
+      drawTrend();
+      trackEvent("unl_trend_added", { lab_name: state.labName });
+    }
+
+    function clearTrend() {
+      state.trendEntries = state.labName ? [{ date: state.labDate, value: state.result }] : [];
+      renderEntries();
+      drawTrend();
+      trackEvent("unl_trend_cleared", { lab_name: state.labName || "none" });
+    }
+
+    function renderEntries() {
+      el.entryList.innerHTML = "";
+      if (!state.trendEntries.length) {
+        el.entryList.innerHTML = `<div class="tiny">No trend data added yet.</div>`;
+        return;
+      }
+
+      state.trendEntries.forEach((entry, i) => {
+        const row = document.createElement("div");
+        row.className = "entry-item";
+        row.innerHTML = `
+          <div>
+            <strong>${state.labName || "Lab"} · ${entry.value}</strong>
+            <small>${entry.date}</small>
+          </div>
+          <button class="btn-dark" type="button" data-remove="${i}" style="padding:10px 12px;">Remove</button>
+        `;
+        el.entryList.appendChild(row);
+      });
+
+      el.entryList.querySelectorAll("[data-remove]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.dataset.remove);
+          state.trendEntries.splice(i, 1);
+          renderEntries();
+          drawTrend();
+        });
+      });
+    }
+
+    function drawTrend() {
+      const canvas = el.trendCanvas;
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const left = 60;
+      const right = w - 20;
+      const top = 18;
+      const bottom = h - 34;
+      const plotWidth = right - left;
+      const plotHeight = bottom - top;
+
+      const bg = ctx.createLinearGradient(0, 0, 0, h);
+      bg.addColorStop(0, "rgba(255,255,255,0.02)");
+      bg.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.08)";
+      ctx.lineWidth = 1;
+      for (let i = 1; i < 5; i++) {
+        const y = (h / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(left, y);
+        ctx.lineTo(right, y);
+        ctx.stroke();
+      }
+
+      if (!state.trendEntries.length) {
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.font = "16px Arial";
+        ctx.fillText("Trend chart will appear here.", 70, h / 2);
+        return;
+      }
+
+      const values = state.trendEntries.map(e => e.value);
+      let min = Math.min(...values);
+      let max = Math.max(...values);
+
+      if (!Number.isNaN(state.low)) min = Math.min(min, state.low);
+      if (!Number.isNaN(state.high)) max = Math.max(max, state.high);
+
+      if (min === max) {
+        min -= 1;
+        max += 1;
+      }
+
+      function yFor(v) {
+        return bottom - ((v - min) / (max - min)) * plotHeight;
+      }
+
+      if (!Number.isNaN(state.low) && !Number.isNaN(state.high)) {
+        const yHigh = yFor(state.high);
+        const yLow = yFor(state.low);
+
+        ctx.fillStyle = "rgba(57,255,20,0.07)";
+        ctx.fillRect(left, yHigh, plotWidth, yLow - yHigh);
+
+        ctx.strokeStyle = "rgba(57,255,20,0.45)";
+        ctx.setLineDash([8, 5]);
+
+        ctx.beginPath();
+        ctx.moveTo(left, yHigh);
+        ctx.lineTo(right, yHigh);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(left, yLow);
+        ctx.lineTo(right, yLow);
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+        ctx.fillStyle = "rgba(57,255,20,0.9)";
+        ctx.font = "12px Arial";
+        ctx.fillText(`High ${state.high}`, left + 6, yHigh - 6);
+        ctx.fillText(`Low ${state.low}`, left + 6, yLow - 6);
+      }
+
+      ctx.fillStyle = "rgba(255,255,255,0.7)";
+      ctx.font = "12px Arial";
+      ctx.fillText(max.toFixed(2), 10, top + 4);
+      ctx.fillText(min.toFixed(2), 10, bottom);
+
+      const n = state.trendEntries.length;
+      const stepX = n === 1 ? 0 : plotWidth / (n - 1);
+
+      const grad = ctx.createLinearGradient(left, 0, right, 0);
+      grad.addColorStop(0, "#ff4fd8");
+      grad.addColorStop(.5, "#9a5cff");
+      grad.addColorStop(1, "#00eaff");
+
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+
+      state.trendEntries.forEach((entry, i) => {
+        const x = left + stepX * i;
+        const y = yFor(entry.value);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      state.trendEntries.forEach((entry, i) => {
+        const x = left + stepX * i;
+        const y = yFor(entry.value);
+
+        ctx.beginPath();
+        ctx.fillStyle = "#00eaff";
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.font = "11px Arial";
+        ctx.fillText(String(entry.value), x - 10, y - 10);
+        ctx.fillText(entry.date.slice(5), x - 18, h - 12);
+      });
+    }
+
+    function buildReport() {
+      const patientName = el.patientName.value.trim() || "Patient";
+      const patientEmail = el.patientEmail.value.trim() || "Not entered";
+      const trendText = state.trendEntries.length
+        ? state.trendEntries.map(e => `${e.date}: ${e.value}`).join("\n")
+        : "No trend entries recorded.";
+
+      return `UNL™ HEALTH ANALYZER PRO
+Powered by Unhinged N Loud™
+
+Patient Name: ${patientName}
+Email: ${patientEmail}
+Report Date: ${new Date().toLocaleDateString()}
+
+LAB INFORMATION
+Lab Name: ${state.labName}
+Lab Date: ${state.labDate}
+Result: ${state.result}
+Reference Range: ${state.low} to ${state.high}
+Status: ${state.status}
+
+SUMMARY
+${state.summaryLine}
+
+DOCTOR-LANGUAGE SUMMARY
+${stripHtml(state.doctorLine)}
+
+ADVOCACY NOTE
+${stripHtml(state.advocacyLine)}
+
+SYMPTOMS
+${state.symptoms || "None entered"}
+
+PATTERN / CONTEXT NOTES
+${state.context || "None entered"}
+
+TREND ENTRIES
+${trendText}
+
+EDUCATIONAL NOTE
+This tool is for organization and advocacy support. It does not diagnose disease or replace medical care.`;
+    }
+
+    function stripHtml(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      return div.textContent || div.innerText || "";
+    }
+
+    function generateSummary() {
+      if (!state.labName) {
+        alert("Analyze a lab first.");
+        return;
+      }
+
+      const report = buildReport();
+      el.reportPreview.textContent = report;
+      el.reportPreview.classList.remove("hidden");
+
+      if (el.patientEmail.value.trim()) {
+        el.emailNotice.textContent = `Email entered: ${el.patientEmail.value.trim()} — included in the report for record purposes only.`;
+      } else {
+        el.emailNotice.textContent = "No email entered. You can still download the PDF.";
+      }
+
+      trackEvent("unl_summary_generated", { lab_name: state.labName });
+    }
+
+    function downloadPDF() {
+      if (!state.labName) {
+        alert("Analyze a lab first.");
+        return;
+      }
+
+      const report = buildReport();
+      const doc = new jsPDF();
+      let y = 16;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("UNL Health Analyzer Pro Report", 14, y);
+      y += 10;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+
+      report.split("\n").forEach(line => {
+        const wrapped = doc.splitTextToSize(line, 180);
+        wrapped.forEach(chunk => {
+          if (y > 280) {
+            doc.addPage();
+            y = 16;
+          }
+          doc.text(chunk, 14, y);
+          y += 6.3;
+        });
+      });
+
+      const safeName = (state.labName || "lab").replace(/\s+/g, "_").toLowerCase();
+      doc.save(`${safeName}_unl_health_report.pdf`);
+
+      trackEvent("unl_pdf_downloaded", { lab_name: state.labName });
+    }
+
+    el.analyzeBtn.addEventListener("click", analyze);
+    el.clearBtn.addEventListener("click", clearAll);
+    el.openTrendBtn.addEventListener("click", openTrend);
+    el.openReportBtn.addEventListener("click", openReport);
+    el.addTrendBtn.addEventListener("click", addTrend);
+    el.clearTrendBtn.addEventListener("click", clearTrend);
+    el.generateBtn.addEventListener("click", generateSummary);
+    el.downloadBtn.addEventListener("click", downloadPDF);
+
+    const today = new Date().toISOString().split("T")[0];
+    el.labDate.value = today;
+    el.trendDate.value = today;
+
+    renderEntries();
+    drawTrend();
+  </script>
 </body>
 </html>
