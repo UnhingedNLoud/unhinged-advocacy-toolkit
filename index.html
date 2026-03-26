@@ -1,150 +1,698 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Trend Visualizer™ | Unhinged N Loud™</title>
+  <meta
+    name="description"
+    content="Track one lab at a time, see if it is low, in range, or high, and create a doctor-friendly summary."
+  />
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-NC23MJSJ1L"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <!-- jsPDF for PDF download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  gtag('config', 'G-NC23MJSJ1L');
-</script>
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: #0c0c0f;
+      --panel-2: #121218;
+      --border: rgba(255,255,255,0.08);
+      --text: #f5f5f7;
+      --muted: #a7a7b3;
+      --cyan: #00eaff;
+      --green: #39ff14;
+      --pink: #ff4fd8;
+      --purple: #9b5cff;
+      --yellow: #ffe95c;
+      --danger: #ff5e7e;
+      --ok: #44ff99;
+      --warn: #ffd84d;
+      --shadow-cyan: 0 0 18px rgba(0,234,255,0.35);
+      --shadow-green: 0 0 18px rgba(57,255,20,0.28);
+      --radius: 18px;
+    }
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNHINGED N LOUD™ | THE LAB</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --neon-pink: #FF2D95;
-            --neon-purple: #A855F7;
-            --neon-blue: #00E5FF;
-            --ombre-grad: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
-        }
-        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
-        
-        .glow-text-pink { text-shadow: 0 0 30px rgba(255, 45, 149, 0.8); color: var(--neon-pink); }
-        
-        .text-gradient {
-            background: var(--ombre-grad);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at top left, rgba(0,234,255,0.08), transparent 22%),
+        radial-gradient(circle at top right, rgba(57,255,20,0.06), transparent 22%),
+        linear-gradient(180deg, #020202 0%, #050505 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100%;
+    }
 
-        .glass-card:hover {
-            transform: scale(1.02);
-            border-color: var(--neon-purple);
-            box-shadow: 0 0 40px rgba(168, 85, 247, 0.2);
-        }
+    a {
+      color: inherit;
+    }
 
-        .btn-main {
-            background: var(--ombre-grad);
-            color: #000;
-            font-weight: 900;
-            padding: 20px 40px;
-            border-radius: 12px;
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: 0.3s;
-        }
+    .wrap {
+      width: min(1120px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 28px 0 64px;
+    }
 
-        .btn-main:hover {
-            box-shadow: 0 0 30px var(--neon-blue);
-            transform: translateY(-3px);
-        }
+    .hero {
+      border: 1px solid rgba(0,234,255,0.16);
+      background: linear-gradient(180deg, rgba(0,234,255,0.06), rgba(255,255,255,0.01));
+      border-radius: 26px;
+      padding: 24px 18px;
+      box-shadow: var(--shadow-cyan);
+      margin-bottom: 20px;
+    }
 
-        /* Animated background glow */
-        .bg-glow {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% -20%, rgba(255, 45, 149, 0.15), transparent 50%);
-            pointer-events: none;
-            z-index: -1;
-        }
-    </style>
+    .brand {
+      display: inline-block;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      line-height: 0.95;
+      font-size: clamp(2.1rem, 7vw, 4.8rem);
+      font-weight: 900;
+      font-style: italic;
+      color: var(--cyan);
+      text-shadow: 0 0 18px rgba(0,234,255,0.45);
+    }
+
+    .hero p.lead {
+      margin: 14px 0 8px;
+      font-size: clamp(1.05rem, 2.4vw, 1.45rem);
+      font-weight: 800;
+      max-width: 850px;
+    }
+
+    .hero p.sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 760px;
+      line-height: 1.6;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .panel.cyan {
+      border-color: rgba(0,234,255,0.35);
+      box-shadow: var(--shadow-cyan);
+    }
+
+    .panel.green {
+      border-color: rgba(57,255,20,0.35);
+      box-shadow: var(--shadow-green);
+    }
+
+    .panel.purple {
+      border-color: rgba(155,92,255,0.34);
+      box-shadow: 0 0 18px rgba(155,92,255,0.18);
+    }
+
+    .step {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      color: var(--yellow);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      line-height: 1.1;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #d8d8e0;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #0a0a0d;
+      color: white;
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-size: 16px;
+      outline: none;
+      transition: 0.18s ease;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #808091;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0,234,255,0.12);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      transition: transform 0.08s ease, opacity 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    button:hover {
+      opacity: 0.96;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--pink), var(--purple), var(--cyan));
+      color: #08080a;
+      box-shadow: 0 0 18px rgba(155,92,255,0.25);
+    }
+
+    .btn-secondary {
+      background: #101015;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .btn-green {
+      background: linear-gradient(90deg, #a4ff35, #39ff14);
+      color: #081005;
+      box-shadow: 0 0 18px rgba(57,255,20,0.25);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .result-card {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 900;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    .status-high {
+      color: #12060a;
+      background: var(--danger);
+    }
+
+    .status-low {
+      color: #171104;
+      background: var(--warn);
+    }
+
+    .status-range {
+      color: #03110a;
+      background: var(--ok);
+    }
+
+    .result-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 12px;
+    }
+
+    .stat {
+      background: #09090d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .stat .k {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
+
+    .stat .v {
+      font-size: 1.15rem;
+      font-weight: 900;
+    }
+
+    .hint-box {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(0,234,255,0.05);
+      border: 1px solid rgba(0,234,255,0.2);
+      color: #d9fbff;
+      line-height: 1.55;
+    }
+
+    .mini-title {
+      font-size: 1rem;
+      font-weight: 900;
+      margin: 0 0 8px;
+      color: white;
+    }
+
+    .canvas-wrap {
+      margin-top: 14px;
+      background: #060608;
+      border: 1px solid rgba(57,255,20,0.25);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: var(--shadow-green);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 220px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0));
+      border-radius: 14px;
+    }
+
+    .entry-list {
+      margin-top: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .entry-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #09090d;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .entry-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .entry-item span {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .tiny {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .report-box {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      background: #09090d;
+      border: 1px solid rgba(255,255,255,0.08);
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: #8e8ea1;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 860px) {
+      .grid.two,
+      .grid.three,
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wrap {
+        width: min(100% - 16px, 1120px);
+        padding-top: 16px;
+      }
+
+      .hero,
+      .panel {
+        padding: 16px;
+      }
+
+      canvas {
+        height: 200px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="bg-glow"></div>
-
-    <main class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-        <header class="mb-16">
-            <h1 class="text-7xl md:text-9xl font-black italic glow-text-pink mb-4 uppercase">
-                THE LAB
-            </h1>
-            <p class="text-xl md:text-2xl font-bold tracking-[0.3em] text-white/60 uppercase">
-                Unhinged <span class="text-gradient">N Loud™</span>
-            </p>
-          <p class="text-gray-300 mt-6 text-lg md:text-xl font-bold text-center max-w-2xl mx-auto">
-  Your symptoms aren’t random. Your labs aren’t being explained.  
-  This is where you start connecting the dots — and finally have something to show for it.
-</p>
-        </header>
-
-        <div class="grid md:grid-cols-2 gap-8 max-w-5xl w-full">
-            <div class="glass-card p-10 flex flex-col items-center">
-                <div class="w-16 h-1 w-full bg-gradient-to-r from-pink-500 to-purple-500 mb-6"></div>
-                <h2 class="text-3xl font-black mb-4 uppercase leading-none">Biometric<br>Analyzer</h2>
-                <p class="text-gray-400 mb-8 font-medium">Translate symptoms into "Doctor Speak" and organize your daily logs.
-                </p> <p class="text-xs text-gray-500 mt-2"> Turn “I feel off” into something doctors take seriously.
+  <div class="wrap">
+    <section class="hero">
+      <div class="brand">Unhinged N Loud™</div>
+      <h1>LAB TREND VISUALIZER™</h1>
+      <p class="lead">Your labs aren’t random. This tool helps you see the pattern your doctor might be missing.</p>
+      <p class="sub">
+        Clean version: one clear starting point, one clear result, optional trend tracking, and a doctor summary you can save.
       </p>
-              <a href="analyzer.html" class="btn-main w-full">Translate My Symptoms →</a>
+    </section>
 
-            <div class="glass-card p-10 flex flex-col items-center">
-                <div class="w-16 h-1 w-full bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
-                <h2 class="text-3xl font-black mb-4 uppercase leading-none">Trend<br>Visualizer</h2>
-                <p class="text-gray-400 mb-8 font-medium">Give them the receipts. Turn lab values into undeniable data trends.</
-               <p class="text-xs text-gray-500 mt-2"> Stop guessing. Start showing patterns over time.
-        </p> 
-                  <a href="visualizer.html" class="btn-main w-full">Track My Lab Patterns →</a>
+    <div class="stack">
+      <!-- STEP 1 -->
+      <section class="panel cyan">
+        <div class="step">Step 1 · Analyze one lab</div>
+        <h2>Enter Your Lab Result</h2>
+        <p class="muted">Start with one test. This gives users a quick win first instead of making them fill out multiple confusing screens.</p>
+
+        <div class="grid two">
+          <div>
+            <label for="labName">Lab Name</label>
+            <input id="labName" type="text" placeholder="Example: CRP, TSH, ESR, Ferritin, Vitamin D" />
+          </div>
+          <div>
+            <label for="labDate">Date</label>
+            <input id="labDate" type="date" />
+          </div>
         </div>
 
-        <footer style="
-    margin-top: 60px;
-    padding: 25px;
-    text-align: center;
-    font-size: 12px;
-    color: #00f0ff;
-    border-top: 1px solid #00f0ff;
-    background: rgba(0,0,0,0.8);
-">
-    <p style="color:#00f0ff;">
-  © 2026 Unhinged N Loud™. All rights reserved.
-</p>
+        <div class="grid three">
+          <div>
+            <label for="labResult">Your Result</label>
+            <input id="labResult" type="number" step="any" placeholder="Example: 12.5" />
+          </div>
+          <div>
+            <label for="refLow">Reference Low</label>
+            <input id="refLow" type="number" step="any" placeholder="Example: 0.0" />
+          </div>
+          <div>
+            <label for="refHigh">Reference High</label>
+            <input id="refHigh" type="number" step="any" placeholder="Example: 10.0" />
+          </div>
+        </div>
 
-    <p style="color:#aaa;">
-        All tools, systems, and frameworks are proprietary intellectual property.
-    </p>
+        <div class="btn-row">
+          <button class="btn-primary" id="analyzeBtn">Analyze My Lab</button>
+          <button class="btn-secondary" id="clearBtn" type="button">Clear</button>
+        </div>
 
-    <p <p style="margin-top:10px; color:#00f0ff;">
-Be Loud. Bring Receipts.
-</p>
+        <div id="analyzeError" class="hint-box hidden"></div>
 
-<p style="color:#888; font-size:10px;">
-Use of this platform is subject to proprietary rights and terms.
-</p>
+        <div id="resultCard" class="result-card hidden">
+          <div id="statusPill" class="status-pill">Status</div>
+          <h3 class="mini-title" id="resultHeadline">Your result</h3>
+          <div class="muted" id="resultSummary"></div>
 
-<p style="margin-top:15px; font-size:11px;">
-  <a href="terms.html" style="color:#00f0ff;">Terms</a> |
-  <a href="privacy.html" style="color:#00f0ff;">Privacy</a> |
-  <a href="disclaimer.html" style="color:#00f0ff;">Medical Disclaimer</a>
-</p>
-</footer>
-    </main>
-</body>
-</html>
+          <div class="result-grid">
+            <div class="stat">
+              <div class="k">Lab</div>
+              <div class="v" id="statLab">—</div>
+            </div>
+            <div class="stat">
+              <div class="k">Your Result</div>
+              <div class="v" id="statResult">—</div>
+            </div>
+            <div class="stat">
+              <div class="k">Reference Range</div>
+              <div class="v" id="statRange">—</div>
+            </div>
+            <div class="stat">
+              <div class="k">Difference</div>
+              <div class="v" id="statDiff">—</div>
+            </div>
+          </div>
 
+          <div class="hint-box" id="doctorLanguageBox"></div>
 
+          <div class="btn-row">
+            <button class="btn-green" id="showTrackerBtn" type="button">Track This Lab Over Time</button>
+            <button class="btn-secondary" id="jumpReportBtn" type="button">Create Doctor Summary</button>
+          </div>
+        </div>
+      </section>
 
+      <!-- STEP 2 -->
+      <section class="panel green hidden" id="trackerSection">
+        <div class="step">Step 2 · Optional trend tracking</div>
+        <h2>Track Your Trend</h2>
+        <p class="muted">Only show this after the first result. That way users understand the value before they do extra work.</p>
 
+        <div class="grid three">
+          <div>
+            <label for="trendDate">Entry Date</label>
+            <input id="trendDate" type="date" />
+          </div>
+          <div>
+            <label for="trendValue">Lab Value</label>
+            <input id="trendValue" type="number" step="any" placeholder="Example: 9.8" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn-primary" id="addTrendBtn" type="button" style="width:100%;">Add To Trend</button>
+          </div>
+        </div>
+
+        <div class="canvas-wrap">
+          <canvas id="trendCanvas" width="1000" height="220"></canvas>
+        </div>
+
+        <div class="entry-list" id="entryList"></div>
+
+        <div class="btn-row">
+          <button class="btn-secondary" id="clearTrendBtn" type="button">Clear Trend Data</button>
+        </div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="panel purple hidden" id="reportSection">
+        <div class="step">Step 3 · Doctor summary</div>
+        <h2>Build Your Analyzer Report</h2>
+        <p class="muted">This is the clean end step. Fill in notes, enter an email if you want, then download the PDF summary.</p>
+
+        <div class="grid two">
+          <div>
+            <label for="patientName">Your Name</label>
+            <input id="patientName" type="text" placeholder="Your name" />
+          </div>
+          <div>
+            <label for="patientEmail">Email For Record</label>
+            <input id="patientEmail" type="email" placeholder="you@example.com" />
+          </div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label for="symptomsNotes">Symptoms / Notes</label>
+            <textarea id="symptomsNotes" placeholder="Example: fatigue, brain fog, headaches, joint pain, digestive symptoms, worsening over time"></textarea>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" id="generateReportBtn" type="button">Generate Summary</button>
+          <button class="btn-green" id="downloadPdfBtn" type="button">Download Doctor Summary PDF</button>
+        </div>
+
+        <div class="tiny" id="emailMessage"></div>
+
+        <div class="report-box hidden" id="reportPreview"></div>
+
+        <div class="footer-note">
+          Unhinged N Loud™ educational tool. This does not diagnose disease. It helps organize data and support stronger patient communication.
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const { jsPDF } = window.jspdf;
+
+    const state = {
+      currentLab: "",
+      currentDate: "",
+      currentResult: null,
+      currentLow: null,
+      currentHigh: null,
+      currentStatus: "",
+      currentDoctorPhrase: "",
+      currentSummary: "",
+      trendEntries: []
+    };
+
+    const el = {
+      labName: document.getElementById("labName"),
+      labDate: document.getElementById("labDate"),
+      labResult: document.getElementById("labResult"),
+      refLow: document.getElementById("refLow"),
+      refHigh: document.getElementById("refHigh"),
+      analyzeBtn: document.getElementById("analyzeBtn"),
+      clearBtn: document.getElementById("clearBtn"),
+      analyzeError: document.getElementById("analyzeError"),
+      resultCard: document.getElementById("resultCard"),
+      statusPill: document.getElementById("statusPill"),
+      resultHeadline: document.getElementById("resultHeadline"),
+      resultSummary: document.getElementById("resultSummary"),
+      statLab: document.getElementById("statLab"),
+      statResult: document.getElementById("statResult"),
+      statRange: document.getElementById("statRange"),
+      statDiff: document.getElementById("statDiff"),
+      doctorLanguageBox: document.getElementById("doctorLanguageBox"),
+      showTrackerBtn: document.getElementById("showTrackerBtn"),
+      jumpReportBtn: document.getElementById("jumpReportBtn"),
+
+      trackerSection: document.getElementById("trackerSection"),
+      trendDate: document.getElementById("trendDate"),
+      trendValue: document.getElementById("trendValue"),
+      addTrendBtn: document.getElementById("addTrendBtn"),
+      clearTrendBtn: document.getElementById("clearTrendBtn"),
+      entryList: document.getElementById("entryList"),
+      trendCanvas: document.getElementById("trendCanvas"),
+
+      reportSection: document.getElementById("reportSection"),
+      patientName: document.getElementById("patientName"),
+      patientEmail: document.getElementById("patientEmail"),
+      symptomsNotes: document.getElementById("symptomsNotes"),
+      generateReportBtn: document.getElementById("generateReportBtn"),
+      downloadPdfBtn: document.getElementById("downloadPdfBtn"),
+      reportPreview: document.getElementById("reportPreview"),
+      emailMessage: document.getElementById("emailMessage")
+    };
+
+    function trackEvent(name, params = {}) {
+      try {
+        if (typeof gtag === "function") {
+          gtag("event", name, params);
+        }
+      } catch (err) {
+        console.log("Analytics event skipped:", name);
+      }
+    }
+
+    function num(val) {
+      return Number(val);
+    }
+
+    function fmt(val) {
+      if (val === null || val === undefined || Number.isNaN(val)) return "—";
+      return Number(val).toString();
+    }
+
+    function showError(message) {
+      el.analyzeError.textContent = message;
+      el.analyzeError.classList.remove("hidden");
+    }
+
+    function hideError() {
+      el.analyzeError.textContent = "";
+      el.analyzeError.classList.add("hidden");
+    }
+
+    function getStatus(result, low, high) {
+      if (result < low) return "LOW";
+      if (result > high) return "HIGH";
+      return "IN RANGE";
+    }
+
+    function getDifferenceText(result, low, high, status) {
+      if (status === "LOW") return `${(low - result).toFixed(2)} below low`;
+      if (status === "HIGH") return `${(result - high).toFixed(2)} above high`;
+      return "Within range";
+    }
+
+    function getDoctorLanguage(lab, status, result, low, high) {
+      if (status === "HIGH") {
+        return `Suggested note: ${lab} is elevated at ${result} compared with the reference range of ${low} to ${high}.`;
+      }
+      if (status === "LOW") {
+        return `Suggested note: ${lab} is low at ${result} compared with the reference range of ${low} to ${high}.`;
+      }
+      return `Suggested note: ${lab} is currently within the provided reference range at ${result} (${low} to ${high}), but trend and symptoms may still matter clinically.`;
+    }
+
+    function getSupportSummary(lab, status) {
+      if (status === "HIGH") {
+        return `Your ${lab} is above the range you entered. That does not diagnose anything by itself, but it may support a conversation about inflammation, thyroid patterns, deficiencies, or follow-up testing depending on the lab.`;
+      }
+      if (status === "LOW") {
+        return `Your ${lab} is below the range you entered. That does not diagnose anything by itself, but it may be worth discussing symptoms, retesting, and pattern history with your
