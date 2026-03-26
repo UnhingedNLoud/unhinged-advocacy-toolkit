@@ -3,106 +3,577 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>THE LAB | Biometric Analyzer™</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <title>UNL Analyzer Report</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
       background: #000;
       color: #fff;
-      font-family: 'Inter', sans-serif;
-    }
-    .btn-main {
-      background: linear-gradient(90deg, #ff2d95, #a855f7, #00e5ff);
-      color: #000;
-      font-weight: 900;
-      text-transform: uppercase;
-      padding: 14px 20px;
-      border-radius: 10px;
-      width: 100%;
-    }
-    textarea {
-      width: 100%;
-      min-height: 220px;
-      background: #111;
-      border: 1px solid #333;
-      color: #fff;
-      border-radius: 10px;
-      padding: 16px;
-      outline: none;
-      resize: vertical;
-    }
-    .card {
-      background: #0a0a0a;
-      border: 1px solid #222;
-      border-radius: 16px;
       padding: 24px;
     }
-    .small-link {
-      font-size: 11px;
-      text-transform: uppercase;
-      font-weight: 800;
-      color: #9ca3af;
+
+    .report-wrap {
+      max-width: 950px;
+      margin: 0 auto;
+      background: #050505;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 0 30px rgba(255, 0, 170, 0.08);
     }
-    .small-link:hover {
-      color: white;
+
+    .title {
+      margin: 0 0 10px;
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.05;
+      background: linear-gradient(90deg, #ff2ea6, #9f63ff, #22d3ee, #8bff4d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      margin: 0 0 24px;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.7;
+      font-size: 17px;
+    }
+
+    .card {
+      background: #0d0d0d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 22px;
+      color: #fff;
+    }
+
+    .muted {
+      color: rgba(255,255,255,0.8);
+      line-height: 1.7;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: #111;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #ff2ea6, #9f63ff, #22d3ee);
+      color: #000;
+    }
+
+    .btn-secondary {
+      background: #111;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .btn-accent {
+      background: linear-gradient(90deg, #8bff4d, #22d3ee);
+      color: #000;
+    }
+
+    .output {
+      margin-top: 22px;
+      background: #0a0a0a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 22px;
+      min-height: 180px;
+      line-height: 1.7;
+    }
+
+    .output h4 {
+      margin: 0 0 12px;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .output strong {
+      color: #fff;
+    }
+
+    .small-note {
+      margin-top: 14px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 460px;
+      background: #050505;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 0 30px rgba(255,0,170,0.12);
+    }
+
+    .modal-title {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #ff2ea6, #9f63ff, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .modal-text {
+      margin: 0 0 16px;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.6;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .message {
+      min-height: 22px;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 760px) {
+      .field-grid,
+      .button-row,
+      .modal-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        font-size: 30px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+        padding: 0;
+      }
+
+      .report-wrap,
+      .card,
+      .output {
+        background: #fff !important;
+        color: #000 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      .title {
+        -webkit-text-fill-color: #000 !important;
+        color: #000 !important;
+        background: none !important;
+      }
+
+      .subtitle,
+      .muted,
+      .small-note {
+        color: #333 !important;
+      }
+
+      .button-row,
+      .modal {
+        display: none !important;
+      }
     }
   </style>
 </head>
-<body class="p-6 md:p-10">
-
-  <nav class="mb-8">
-    <a href="index.html" class="small-link">← Back to Hub</a>
-  </nav>
-
-  <header class="mb-10 max-w-4xl">
-    <h1 class="text-5xl md:text-7xl font-black italic uppercase leading-tight">
-      Biometric Analyzer™
-    </h1>
-    <p class="mt-3 text-gray-400 font-bold uppercase tracking-wider text-sm">
-      Turn raw symptom language into organized clinical receipts.
+<body>
+  <div class="report-wrap">
+    <h1 class="title">Analyzer Report</h1>
+    <p class="subtitle">
+      Turn symptom notes and lab patterns into a cleaner summary you can save, print, or bring to an appointment.
     </p>
-  </header>
 
-  <main class="max-w-4xl mx-auto">
-    <section class="card">
-      <h2 class="text-xl font-black uppercase mb-4">Dump the Data</h2>
+    <div class="card">
+      <h3>Patient / Report Details</h3>
+      <div class="field-grid">
+        <div class="field">
+          <label for="patientName">Name</label>
+          <input id="patientName" type="text" placeholder="Your name" />
+        </div>
 
-      <textarea
-        id="rawInput"
-        placeholder="Paste your symptom notes, flare notes, fatigue, dizziness, pain, medication notes, observations..."
-      ></textarea>
+        <div class="field">
+          <label for="reportDate">Date</label>
+          <input id="reportDate" type="date" />
+        </div>
 
-      <div class="mt-6 flex flex-col md:flex-row gap-4">
-        <button onclick="buildReport()" class="btn-main md:w-auto">Build My Report</button>
-        <button onclick="loadDemo()" class="small-link">Load Demo</button>
-        <button onclick="clearAll()" class="small-link">Clear All</button>
+        <div class="field full">
+          <label for="labName">Lab Test Being Tracked</label>
+          <input id="labName" type="text" placeholder="Example: TSH, CRP, ESR, Ferritin, Vitamin D" />
+        </div>
+
+        <div class="field full">
+          <label for="labValues">Lab Results (Oldest to Newest)</label>
+          <input id="labValues" type="text" placeholder="Example: 2.1, 2.5, 3.0, 3.4" />
+        </div>
+
+        <div class="field">
+          <label for="refLow">Reference Range Low</label>
+          <input id="refLow" type="number" step="any" placeholder="Example: 1.8" />
+        </div>
+
+        <div class="field">
+          <label for="refHigh">Reference Range High</label>
+          <input id="refHigh" type="number" step="any" placeholder="Example: 4.0" />
+        </div>
+
+        <div class="field full">
+          <label for="symptoms">Symptoms / Notes</label>
+          <textarea id="symptoms" placeholder="Example: fatigue, brain fog, joint pain, headaches, digestive symptoms"></textarea>
+        </div>
       </div>
-    </section>
-  </main>
+
+      <div class="button-row">
+        <button id="generateReportBtn" class="btn-primary" type="button">GENERATE REPORT</button>
+        <button id="downloadDoctorSummaryBtn" class="btn-accent" type="button">DOWNLOAD DOCTOR SUMMARY</button>
+        <button id="downloadPdfReceiptBtn" class="btn-secondary" type="button">DOWNLOAD PDF RECEIPT</button>
+      </div>
+    </div>
+
+    <div id="reportOutput" class="output">
+      <h4>Your report will appear here.</h4>
+      <div class="muted">
+        Fill in the analyzer details above, then click <strong>Generate Report</strong>.
+      </div>
+    </div>
+
+    <div class="small-note">
+      This tool is for organization and education only. It does not diagnose or replace medical care.
+    </div>
+  </div>
+
+  <div id="emailModal" class="modal">
+    <div class="modal-box">
+      <h3 id="modalTitle" class="modal-title">Get Your PDF</h3>
+      <p id="modalText" class="modal-text">
+        Enter your email below before downloading your document.
+      </p>
+
+      <div class="field">
+        <label for="captureEmail">Email Address</label>
+        <input id="captureEmail" type="email" placeholder="you@example.com" />
+      </div>
+
+      <div id="modalMessage" class="message"></div>
+
+      <div class="modal-actions">
+        <button id="confirmEmailBtn" class="btn-primary" type="button">CONTINUE</button>
+        <button id="closeModalBtn" class="btn-secondary" type="button">CLOSE</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    function buildReport() {
-      const input = document.getElementById('rawInput').value.trim();
-      if (!input) return;
+    (function () {
+      const patientName = document.getElementById("patientName");
+      const reportDate = document.getElementById("reportDate");
+      const labName = document.getElementById("labName");
+      const labValues = document.getElementById("labValues");
+      const refLow = document.getElementById("refLow");
+      const refHigh = document.getElementById("refHigh");
+      const symptoms = document.getElementById("symptoms");
 
-      if (document.activeElement) {
-        document.activeElement.blur();
+      const generateReportBtn = document.getElementById("generateReportBtn");
+      const downloadDoctorSummaryBtn = document.getElementById("downloadDoctorSummaryBtn");
+      const downloadPdfReceiptBtn = document.getElementById("downloadPdfReceiptBtn");
+      const reportOutput = document.getElementById("reportOutput");
+
+      const emailModal = document.getElementById("emailModal");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalText = document.getElementById("modalText");
+      const captureEmail = document.getElementById("captureEmail");
+      const modalMessage = document.getElementById("modalMessage");
+      const confirmEmailBtn = document.getElementById("confirmEmailBtn");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+
+      let pendingAction = "";
+
+      function parseValues(raw) {
+        return raw
+          .split(",")
+          .map(v => parseFloat(v.trim()))
+          .filter(v => !Number.isNaN(v));
       }
 
-      const url = 'analyzer-report.html?input=' + encodeURIComponent(input) + '&t=' + Date.now();
+      function getTrendDirection(first, last) {
+        if (last > first) return "Increasing";
+        if (last < first) return "Decreasing";
+        return "Stable";
+      }
 
-      window.open(url, '_blank');
-    }
+      function getReferenceStatus(value, low, high) {
+        if (Number.isNaN(low) || Number.isNaN(high)) return "No reference range entered";
+        if (value < low) return "Below range";
+        if (value > high) return "Above range";
+        return "Within range";
+      }
 
-    function loadDemo() {
-      document.getElementById('rawInput').value =
-        "I've been feeling totally wiped out for three days. My brain fog is so bad I can't drive. My joints hurt and I'm feeling shaky even after I took my meds.";
-    }
+      function buildReportHtml() {
+        const name = patientName.value.trim() || "Not entered";
+        const date = reportDate.value || "Not entered";
+        const lab = labName.value.trim() || "Not entered";
+        const notes = symptoms.value.trim() || "No symptom notes entered";
+        const values = parseValues(labValues.value.trim());
+        const low = parseFloat(refLow.value);
+        const high = parseFloat(refHigh.value);
 
-    function clearAll() {
-      document.getElementById('rawInput').value = "";
-    }
+        if (!labName.value.trim()) {
+          return `
+            <h4>Missing Lab Name</h4>
+            <div class="muted">Please enter the lab test being tracked.</div>
+          `;
+        }
+
+        if (values.length < 2) {
+          return `
+            <h4>Need More Results</h4>
+            <div class="muted">Please enter at least 2 lab values in oldest to newest order.</div>
+          `;
+        }
+
+        const first = values[0];
+        const last = values[values.length - 1];
+        const lowest = Math.min(...values);
+        const highest = Math.max(...values);
+        const trend = getTrendDirection(first, last);
+        const status = getReferenceStatus(last, low, high);
+
+        return `
+          <h4>${lab} Analyzer Report</h4>
+          <div><strong>Patient Name:</strong> ${name}</div>
+          <div><strong>Date:</strong> ${date}</div>
+          <div><strong>Lab Test:</strong> ${lab}</div>
+          <div><strong>Results Entered:</strong> ${values.join(", ")}</div>
+          <div><strong>Trend:</strong> ${trend}</div>
+          <div><strong>First Result:</strong> ${first}</div>
+          <div><strong>Latest Result:</strong> ${last}</div>
+          <div><strong>Lowest Result:</strong> ${lowest}</div>
+          <div><strong>Highest Result:</strong> ${highest}</div>
+          <div><strong>Latest Result Status:</strong> ${status}</div>
+          <div><strong>Symptoms / Notes:</strong> ${notes}</div>
+          <div style="margin-top:14px;">
+            <strong>Summary:</strong> This report helps organize one lab pattern over time so it is easier to review changes, compare results, and bring a cleaner summary into appointments.
+          </div>
+        `;
+      }
+
+      function generateReport() {
+        reportOutput.innerHTML = buildReportHtml();
+      }
+
+      function validateReportBeforeDownload() {
+        const values = parseValues(labValues.value.trim());
+        if (!labName.value.trim()) return "Please enter the lab test name first.";
+        if (values.length < 2) return "Please enter at least 2 lab results first.";
+        return "";
+      }
+
+      function openEmailModal(actionType) {
+        const validationError = validateReportBeforeDownload();
+        if (validationError) {
+          reportOutput.innerHTML = `
+            <h4>Complete the Report First</h4>
+            <div class="muted">${validationError}</div>
+          `;
+          return;
+        }
+
+        pendingAction = actionType;
+        captureEmail.value = "";
+        modalMessage.textContent = "";
+
+        if (actionType === "doctor-summary") {
+          modalTitle.textContent = "Download Doctor Summary";
+          modalText.textContent = "Enter your email below before downloading your doctor summary PDF.";
+        } else {
+          modalTitle.textContent = "Download PDF Receipt";
+          modalText.textContent = "Enter your email below before downloading your PDF receipt.";
+        }
+
+        emailModal.style.display = "flex";
+      }
+
+      function emailIsValid(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      function printCurrentReport() {
+        generateReport();
+        setTimeout(function () {
+          window.print();
+        }, 150);
+      }
+
+      function downloadReceiptPdf() {
+        generateReport();
+        const existing = document.getElementById("receiptBox");
+        if (existing) existing.remove();
+
+        const receiptBox = document.createElement("div");
+        receiptBox.id = "receiptBox";
+        receiptBox.style.marginTop = "18px";
+        receiptBox.style.padding = "18px";
+        receiptBox.style.borderRadius = "16px";
+        receiptBox.style.background = "#101010";
+        receiptBox.style.border = "1px solid rgba(255,255,255,0.08)";
+        receiptBox.innerHTML = `
+          <h4 style="margin:0 0 10px;">PDF Receipt</h4>
+          <div><strong>Email Captured:</strong> ${captureEmail.value.trim()}</div>
+          <div><strong>Document:</strong> Analyzer Report PDF Receipt</div>
+          <div><strong>Date:</strong> ${new Date().toLocaleString()}</div>
+          <div style="margin-top:10px;color:rgba(255,255,255,0.8);">
+            This confirms the report was prepared for PDF download.
+          </div>
+        `;
+        reportOutput.appendChild(receiptBox);
+
+        setTimeout(function () {
+          window.print();
+        }, 150);
+      }
+
+      generateReportBtn.addEventListener("click", function () {
+        generateReport();
+      });
+
+      downloadDoctorSummaryBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        openEmailModal("doctor-summary");
+      });
+
+      downloadPdfReceiptBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        openEmailModal("pdf-receipt");
+      });
+
+      closeModalBtn.addEventListener("click", function () {
+        emailModal.style.display = "none";
+      });
+
+      emailModal.addEventListener("click", function (e) {
+        if (e.target === emailModal) {
+          emailModal.style.display = "none";
+        }
+      });
+
+      confirmEmailBtn.addEventListener("click", function () {
+        const email = captureEmail.value.trim();
+
+        if (!email) {
+          modalMessage.textContent = "Please enter your email address.";
+          modalMessage.style.color = "#ff9abf";
+          return;
+        }
+
+        if (!emailIsValid(email)) {
+          modalMessage.textContent = "Please enter a valid email address.";
+          modalMessage.style.color = "#ff9abf";
+          return;
+        }
+
+        modalMessage.textContent = "Email captured successfully.";
+        modalMessage.style.color = "#8bff4d";
+
+        emailModal.style.display = "none";
+
+        if (pendingAction === "doctor-summary") {
+          printCurrentReport();
+        } else {
+          downloadReceiptPdf();
+        }
+      });
+
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+      reportDate.value = `${yyyy}-${mm}-${dd}`;
+    })();
   </script>
 </body>
 </html>
