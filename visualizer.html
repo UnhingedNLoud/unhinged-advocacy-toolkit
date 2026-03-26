@@ -1,86 +1,117 @@
-<section id="lab-trend-visualizer" style="max-width:900px;margin:40px auto;padding:24px;border-radius:20px;background:rgba(255,255,255,0.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.12);color:white;">
-  <h2 style="margin-top:0;font-size:28px;">Lab Trend Visualizer</h2>
-  <p style="opacity:0.9;">Enter your lab values to see whether they are increasing, decreasing, or staying stable.</p>
+<section id="trend-visualizer-tool" style="max-width: 950px; margin: 40px auto; padding: 28px; border-radius: 24px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: white; box-sizing: border-box;">
+  <div style="margin-bottom: 22px;">
+    <h2 style="margin: 0 0 10px; font-size: 34px; line-height: 1.1; font-weight: 800;">Lab Trend Visualizer</h2>
+    <p style="margin: 0; font-size: 17px; line-height: 1.7; opacity: 0.92;">
+      Track <strong>one lab test at a time</strong> so you can see whether your results are increasing, decreasing, or staying stable over time.
+    </p>
+  </div>
 
-  <div style="display:flex;flex-direction:column;gap:14px;">
-    <label for="trendValues" style="font-weight:600;">Lab Values</label>
-    <input
-      id="trendValues"
-      type="text"
-      placeholder="Example: 2.1, 2.5, 3.0, 3.4"
-      style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(0,0,0,0.25);color:white;font-size:16px;outline:none;box-sizing:border-box;"
-    >
+  <div style="padding: 18px; border-radius: 16px; background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 22px; line-height: 1.8; font-size: 15px;">
+    <div style="font-weight: 700; margin-bottom: 8px;">How to use this tool:</div>
+    <div>1. Enter the <strong>name of the lab test</strong> you want to track.</div>
+    <div>2. Enter your <strong>lab results separated by commas</strong>.</div>
+    <div>3. Put the results in <strong>oldest to newest</strong> order.</div>
+    <div>4. Add your lab’s reference range if you have it.</div>
+    <div>5. Click <strong>Track My Lab Pattern</strong> to see the trend and chart.</div>
+  </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div>
-        <label for="trendRefLow" style="display:block;margin-bottom:6px;font-weight:600;">Reference Low (optional)</label>
-        <input
-          id="trendRefLow"
-          type="number"
-          step="any"
-          placeholder="Example: 1.8"
-          style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(0,0,0,0.25);color:white;font-size:16px;outline:none;box-sizing:border-box;"
-        >
-      </div>
+  <div style="display: flex; flex-direction: column; gap: 18px;">
 
-      <div>
-        <label for="trendRefHigh" style="display:block;margin-bottom:6px;font-weight:600;">Reference High (optional)</label>
-        <input
-          id="trendRefHigh"
-          type="number"
-          step="any"
-          placeholder="Example: 4.0"
-          style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(0,0,0,0.25);color:white;font-size:16px;outline:none;box-sizing:border-box;"
-        >
+    <div>
+      <label for="labTestName" style="display:block; margin-bottom:8px; font-weight:700; font-size:16px;">Lab Test Name</label>
+      <input
+        id="labTestName"
+        type="text"
+        placeholder="Example: TSH, CRP, ESR, Ferritin, ANA, Vitamin D"
+        style="width:100%; padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:white; font-size:16px; box-sizing:border-box; outline:none;"
+      />
+      <div style="margin-top:6px; font-size:14px; opacity:0.78;">
+        Enter the exact lab you are tracking.
       </div>
     </div>
 
-    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <div>
+      <label for="labResults" style="display:block; margin-bottom:8px; font-weight:700; font-size:16px;">Lab Results</label>
+      <input
+        id="labResults"
+        type="text"
+        placeholder="Example: 2.1, 2.5, 3.0, 3.4"
+        style="width:100%; padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:white; font-size:16px; box-sizing:border-box; outline:none;"
+      />
+      <div style="margin-top:6px; font-size:14px; opacity:0.78;">
+        Enter your results in <strong>oldest to newest</strong> order, separated by commas.
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+      <div>
+        <label for="refLow" style="display:block; margin-bottom:8px; font-weight:700; font-size:16px;">Reference Range Low (Optional)</label>
+        <input
+          id="refLow"
+          type="number"
+          step="any"
+          placeholder="Example: 1.8"
+          style="width:100%; padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:white; font-size:16px; box-sizing:border-box; outline:none;"
+        />
+      </div>
+
+      <div>
+        <label for="refHigh" style="display:block; margin-bottom:8px; font-weight:700; font-size:16px;">Reference Range High (Optional)</label>
+        <input
+          id="refHigh"
+          type="number"
+          step="any"
+          placeholder="Example: 4.0"
+          style="width:100%; padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:white; font-size:16px; box-sizing:border-box; outline:none;"
+        />
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:4px;">
       <button
-        id="renderTrendBtn"
+        id="trackTrendBtn"
         type="button"
-        style="padding:14px 22px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,#ff4fd8,#9bff6b);color:#111;"
+        style="padding:16px 24px; border:none; border-radius:14px; font-size:16px; font-weight:800; cursor:pointer; background:linear-gradient(90deg,#ff3ea5,#9f63ff,#28d7ff); color:#111;"
       >
-        Track Trend
+        TRACK MY LAB PATTERN
       </button>
 
       <button
-        id="clearTrendVisualizerBtn"
+        id="clearTrendBtn"
         type="button"
-        style="padding:14px 22px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;background:rgba(255,255,255,0.12);color:white;"
+        style="padding:16px 24px; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; background:rgba(255,255,255,0.12); color:white;"
       >
-        Clear
+        CLEAR
       </button>
     </div>
 
     <div
       id="trendSummary"
-      style="min-height:140px;padding:18px;border-radius:14px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.1);line-height:1.6;"
+      style="min-height:170px; padding:20px; border-radius:16px; background:rgba(0,0,0,0.22); border:1px solid rgba(255,255,255,0.08); line-height:1.8; font-size:15px;"
     >
-      Your lab trend summary will appear here.
+      Your lab trend summary will appear here after you enter your lab name and results.
     </div>
 
-    <div
-      style="position:relative;width:100%;height:320px;min-height:320px;max-height:320px;padding:12px;border-radius:14px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.1);overflow:hidden;box-sizing:border-box;"
-    >
-      <canvas id="trendCanvas" height="280"></canvas>
+    <div style="padding:16px; border-radius:16px; background:rgba(0,0,0,0.22); border:1px solid rgba(255,255,255,0.08);">
+      <canvas id="trendChart" style="width:100%; height:320px; display:block;"></canvas>
     </div>
   </div>
 </section>
 
 <script>
 (function () {
-  const valuesInput = document.getElementById("trendValues");
-  const refLowInput = document.getElementById("trendRefLow");
-  const refHighInput = document.getElementById("trendRefHigh");
-  const renderBtn = document.getElementById("renderTrendBtn");
-  const clearBtn = document.getElementById("clearTrendVisualizerBtn");
-  const summaryBox = document.getElementById("trendSummary");
-  const canvas = document.getElementById("trendCanvas");
+  const labTestName = document.getElementById("labTestName");
+  const labResults = document.getElementById("labResults");
+  const refLow = document.getElementById("refLow");
+  const refHigh = document.getElementById("refHigh");
+  const trackTrendBtn = document.getElementById("trackTrendBtn");
+  const clearTrendBtn = document.getElementById("clearTrendBtn");
+  const trendSummary = document.getElementById("trendSummary");
+  const trendChart = document.getElementById("trendChart");
 
-  if (!valuesInput || !refLowInput || !refHighInput || !renderBtn || !clearBtn || !summaryBox || !canvas) return;
+  if (!labTestName || !labResults || !refLow || !refHigh || !trackTrendBtn || !clearTrendBtn || !trendSummary || !trendChart) return;
 
-  const ctx = canvas.getContext("2d");
+  const ctx = trendChart.getContext("2d");
 
   function parseValues(raw) {
     return raw
@@ -90,9 +121,9 @@
   }
 
   function getTrendDirection(first, last) {
-    if (last > first) return "📈 Increasing";
-    if (last < first) return "📉 Decreasing";
-    return "➡️ Stable";
+    if (last > first) return "Increasing";
+    if (last < first) return "Decreasing";
+    return "Stable";
   }
 
   function getReferenceStatus(value, low, high) {
@@ -103,162 +134,195 @@
   }
 
   function prepareCanvas() {
+    const rect = trendChart.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 280 * dpr;
+    const displayWidth = rect.width || 600;
+    const displayHeight = 320;
+
+    trendChart.width = displayWidth * dpr;
+    trendChart.height = displayHeight * dpr;
+
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, rect.width, 280);
-    return { width: rect.width, height: 280 };
+    ctx.clearRect(0, 0, displayWidth, displayHeight);
+
+    return { width: displayWidth, height: displayHeight };
   }
 
-  function drawTrend(values, refLow, refHigh) {
+  function drawChart(values, low, high, label) {
     const { width, height } = prepareCanvas();
-    const padding = 30;
+    const padding = 36;
 
     const allValues = [...values];
-    if (!Number.isNaN(refLow)) allValues.push(refLow);
-    if (!Number.isNaN(refHigh)) allValues.push(refHigh);
+    if (!Number.isNaN(low)) allValues.push(low);
+    if (!Number.isNaN(high)) allValues.push(high);
 
     const minVal = Math.min(...allValues);
     const maxVal = Math.max(...allValues);
-    const range = maxVal - minVal || 1;
+    const range = (maxVal - minVal) || 1;
 
-    function xPos(index, total) {
-      if (total <= 1) return width / 2;
+    function getX(index, total) {
+      if (total === 1) return width / 2;
       return padding + (index * (width - padding * 2)) / (total - 1);
     }
 
-    function yPos(value) {
+    function getY(value) {
       return padding + ((maxVal - value) / range) * (height - padding * 2);
     }
 
+    ctx.strokeStyle = "rgba(255,255,255,0.12)";
     ctx.lineWidth = 1;
-    ctx.strokeStyle = "rgba(255,255,255,0.14)";
+
     for (let i = 0; i < 5; i++) {
-      const y = padding + (i * (height - padding * 2)) / 4;
+      const y = padding + ((height - padding * 2) * i / 4);
       ctx.beginPath();
       ctx.moveTo(padding, y);
       ctx.lineTo(width - padding, y);
       ctx.stroke();
     }
 
-    if (!Number.isNaN(refLow)) {
+    if (!Number.isNaN(low)) {
+      ctx.save();
       ctx.strokeStyle = "rgba(255,255,255,0.25)";
       ctx.setLineDash([6, 6]);
       ctx.beginPath();
-      ctx.moveTo(padding, yPos(refLow));
-      ctx.lineTo(width - padding, yPos(refLow));
+      ctx.moveTo(padding, getY(low));
+      ctx.lineTo(width - padding, getY(low));
       ctx.stroke();
-      ctx.setLineDash([]);
+      ctx.restore();
+
+      ctx.fillStyle = "rgba(255,255,255,0.75)";
+      ctx.font = "12px Arial";
+      ctx.fillText("Low Ref", padding, getY(low) - 8);
     }
 
-    if (!Number.isNaN(refHigh)) {
+    if (!Number.isNaN(high)) {
+      ctx.save();
       ctx.strokeStyle = "rgba(255,255,255,0.25)";
       ctx.setLineDash([6, 6]);
       ctx.beginPath();
-      ctx.moveTo(padding, yPos(refHigh));
-      ctx.lineTo(width - padding, yPos(refHigh));
+      ctx.moveTo(padding, getY(high));
+      ctx.lineTo(width - padding, getY(high));
       ctx.stroke();
-      ctx.setLineDash([]);
+      ctx.restore();
+
+      ctx.fillStyle = "rgba(255,255,255,0.75)";
+      ctx.font = "12px Arial";
+      ctx.fillText("High Ref", padding, getY(high) - 8);
     }
 
+    ctx.strokeStyle = "#ff4fbf";
     ctx.lineWidth = 3;
-    ctx.strokeStyle = "#ff4fd8";
     ctx.beginPath();
+
     values.forEach((value, index) => {
-      const x = xPos(index, values.length);
-      const y = yPos(value);
+      const x = getX(index, values.length);
+      const y = getY(value);
       if (index === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     });
+
     ctx.stroke();
 
     values.forEach((value, index) => {
-      const x = xPos(index, values.length);
-      const y = yPos(value);
-      ctx.fillStyle = "#ff4fd8";
+      const x = getX(index, values.length);
+      const y = getY(value);
+
+      ctx.fillStyle = "#28d7ff";
       ctx.beginPath();
-      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
       ctx.fill();
+
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.font = "12px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("R" + (index + 1), x, height - 10);
     });
 
-    ctx.fillStyle = "rgba(255,255,255,0.9)";
-    ctx.font = "12px Arial";
-    ctx.textAlign = "center";
-
-    values.forEach((_, index) => {
-      const x = xPos(index, values.length);
-      ctx.fillText("L" + (index + 1), x, height - 8);
-    });
+    ctx.fillStyle = "rgba(255,255,255,0.96)";
+    ctx.font = "bold 14px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText(label, padding, 20);
   }
 
   function renderTrend() {
-    const raw = valuesInput.value.trim();
-    const refLow = parseFloat(refLowInput.value);
-    const refHigh = parseFloat(refHighInput.value);
+    const testName = labTestName.value.trim();
+    const rawResults = labResults.value.trim();
+    const low = parseFloat(refLow.value);
+    const high = parseFloat(refHigh.value);
 
-    if (!raw) {
-      summaryBox.innerHTML = "⚠️ Please enter lab values separated by commas.";
+    if (!testName) {
+      trendSummary.innerHTML = "⚠️ Please enter the name of the lab test you are tracking.";
       prepareCanvas();
       return;
     }
 
-    const values = parseValues(raw);
+    if (!rawResults) {
+      trendSummary.innerHTML = "⚠️ Please enter your lab results in oldest to newest order.";
+      prepareCanvas();
+      return;
+    }
+
+    const values = parseValues(rawResults);
 
     if (values.length < 2) {
-      summaryBox.innerHTML = "⚠️ Please enter at least 2 valid lab values.";
+      trendSummary.innerHTML = "⚠️ Please enter at least 2 lab results separated by commas.";
       prepareCanvas();
       return;
     }
 
     const first = values[0];
     const last = values[values.length - 1];
-    const min = Math.min(...values);
-    const max = Math.max(...values);
+    const lowest = Math.min(...values);
+    const highest = Math.max(...values);
     const trend = getTrendDirection(first, last);
-    const status = getReferenceStatus(last, refLow, refHigh);
+    const latestStatus = getReferenceStatus(last, low, high);
 
-    summaryBox.innerHTML = `
-      <div style="font-size:20px;font-weight:700;margin-bottom:10px;">${trend}</div>
-      <div><strong>Values Entered:</strong> ${values.join(", ")}</div>
-      <div><strong>First Value:</strong> ${first}</div>
-      <div><strong>Latest Value:</strong> ${last}</div>
-      <div><strong>Lowest Value:</strong> ${min}</div>
-      <div><strong>Highest Value:</strong> ${max}</div>
-      <div><strong>Latest Reference Status:</strong> ${status}</div>
+    trendSummary.innerHTML = `
+      <div style="font-size:22px; font-weight:800; margin-bottom:10px;">${testName} Trend Summary</div>
+      <div><strong>Lab Being Tracked:</strong> ${testName}</div>
+      <div><strong>Results Entered:</strong> ${values.join(", ")}</div>
+      <div><strong>Trend:</strong> ${trend}</div>
+      <div><strong>First Result:</strong> ${first}</div>
+      <div><strong>Latest Result:</strong> ${last}</div>
+      <div><strong>Lowest Result:</strong> ${lowest}</div>
+      <div><strong>Highest Result:</strong> ${highest}</div>
+      <div><strong>Latest Result Status:</strong> ${latestStatus}</div>
+      <div style="margin-top:10px; opacity:0.82;">
+        This tool helps you see patterns in one lab over time. It does not diagnose, but it can help you organize your data clearly for appointments.
+      </div>
     `;
 
-    drawTrend(values, refLow, refHigh);
+    drawChart(values, low, high, testName);
   }
 
   function clearTrend() {
-    valuesInput.value = "";
-    refLowInput.value = "";
-    refHighInput.value = "";
-    summaryBox.innerHTML = "Your lab trend summary will appear here.";
+    labTestName.value = "";
+    labResults.value = "";
+    refLow.value = "";
+    refHigh.value = "";
+    trendSummary.innerHTML = "Your lab trend summary will appear here after you enter your lab name and results.";
     prepareCanvas();
   }
 
-  renderBtn.addEventListener("click", function (event) {
-    event.preventDefault();
+  trackTrendBtn.addEventListener("click", function (e) {
+    e.preventDefault();
     renderTrend();
   });
 
-  clearBtn.addEventListener("click", function (event) {
-    event.preventDefault();
+  clearTrendBtn.addEventListener("click", function (e) {
+    e.preventDefault();
     clearTrend();
   });
 
   window.addEventListener("resize", function () {
-    const raw = valuesInput.value.trim();
-    const values = parseValues(raw);
-    const refLow = parseFloat(refLowInput.value);
-    const refHigh = parseFloat(refHighInput.value);
+    const currentValues = parseValues(labResults.value.trim());
+    const low = parseFloat(refLow.value);
+    const high = parseFloat(refHigh.value);
+    const testName = labTestName.value.trim();
 
-    if (values.length >= 2) {
-      drawTrend(values, refLow, refHigh);
+    if (currentValues.length >= 2 && testName) {
+      drawChart(currentValues, low, high, testName);
     } else {
       prepareCanvas();
     }
