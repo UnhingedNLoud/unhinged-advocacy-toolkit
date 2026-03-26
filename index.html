@@ -13,9 +13,6 @@
 
   <style>
     :root {
-      --bg: #030303;
-      --panel: #0b0b10;
-      --panel2: #12121a;
       --text: #f7f7fb;
       --muted: #a8a8b8;
       --border: rgba(255,255,255,0.09);
@@ -159,7 +156,7 @@
       color: #dddded;
     }
 
-    input, select, textarea {
+    input, textarea {
       width: 100%;
       border: 1px solid rgba(255,255,255,0.12);
       background: #08080d;
@@ -180,7 +177,7 @@
       color: #828298;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus, textarea:focus {
       border-color: var(--cyan);
       box-shadow: 0 0 0 3px rgba(0,234,255,0.1);
     }
@@ -398,6 +395,48 @@
       line-height: 1.6;
     }
 
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.78);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 9999;
+    }
+
+    .modal {
+      width: min(520px, 100%);
+      background: linear-gradient(180deg, #0d0d14, #08080d);
+      border: 1px solid rgba(0,234,255,0.22);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 0 28px rgba(0,234,255,0.18);
+    }
+
+    .modal h3 {
+      margin: 0 0 10px;
+      color: var(--cyan);
+      font-size: 1.3rem;
+    }
+
+    .modal p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .modal-error {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,79,216,0.08);
+      border: 1px solid rgba(255,79,216,0.25);
+      color: #ffd8f4;
+      font-size: .95rem;
+    }
+
     @media (max-width: 900px) {
       .grid.two, .grid.three, .stats, .adv-grid {
         grid-template-columns: 1fr;
@@ -408,7 +447,7 @@
         padding-top: 12px;
       }
 
-      .hero, .panel {
+      .hero, .panel, .modal {
         padding: 16px;
       }
 
@@ -425,7 +464,7 @@
       <h1>UNL™ ADVOCACY ANALYZER</h1>
       <p class="lead">Labs + symptoms + doctor questions + related labs to discuss + trend tracking + summary report.</p>
       <p class="sub">
-        This version is built to help users understand patterns and prepare for better doctor conversations without replacing medical care.
+        This version helps users organize their patterns and prepare for better doctor conversations.
       </p>
     </section>
 
@@ -453,11 +492,11 @@
           <input id="labResult" type="number" step="any" placeholder="Example: 12.5" />
         </div>
         <div>
-          <label for="refLow">Reference Low</label>
+          <label for="refLow">Normal Range From</label>
           <input id="refLow" type="number" step="any" placeholder="Example: 0" />
         </div>
         <div>
-          <label for="refHigh">Reference High</label>
+          <label for="refHigh">Normal Range To</label>
           <input id="refHigh" type="number" step="any" placeholder="Example: 10" />
         </div>
       </div>
@@ -507,7 +546,7 @@
             <div class="v" id="statResult">—</div>
           </div>
           <div class="stat">
-            <div class="k">Reference Range</div>
+            <div class="k">Normal Range</div>
             <div class="v" id="statRange">—</div>
           </div>
           <div class="stat">
@@ -586,7 +625,7 @@
     <section class="panel pink hidden" id="reportSection">
       <div class="step">Step 4 · Doctor-ready summary</div>
       <h2>Generate Your Report</h2>
-      <p class="muted">Add name and email, preview the summary, then download the PDF.</p>
+      <p class="muted">Preview the summary, then download the PDF.</p>
 
       <div class="grid two">
         <div>
@@ -604,10 +643,28 @@
         <button class="btn-green" id="downloadBtn" type="button">Download Doctor Summary PDF</button>
       </div>
 
-      <div class="tiny" id="emailNotice">Enter an email if you want it included on the report. This version does not send email automatically.</div>
+      <div class="tiny" id="emailNotice">Email is required before the PDF download. This version does not send email automatically.</div>
 
       <div id="reportPreview" class="report-preview hidden"></div>
     </section>
+  </div>
+
+  <!-- EMAIL MODAL -->
+  <div id="emailModalBackdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <h3>Get Your Report</h3>
+      <p>Enter your email before downloading your doctor summary PDF.</p>
+
+      <label for="modalEmail">Email Address</label>
+      <input id="modalEmail" type="email" placeholder="you@example.com" />
+
+      <div class="btn-row">
+        <button class="btn-primary" id="confirmEmailBtn" type="button">Continue To Download</button>
+        <button class="btn-dark" id="cancelEmailBtn" type="button">Cancel</button>
+      </div>
+
+      <div id="modalEmailError" class="modal-error hidden"></div>
+    </div>
   </div>
 
   <script>
@@ -629,7 +686,8 @@
       trendEntries: [],
       doctorQuestions: [],
       relatedLabs: [],
-      patternClues: []
+      patternClues: [],
+      pendingDownload: false
     };
 
     const el = {
@@ -676,7 +734,13 @@
       generateBtn: document.getElementById("generateBtn"),
       downloadBtn: document.getElementById("downloadBtn"),
       reportPreview: document.getElementById("reportPreview"),
-      emailNotice: document.getElementById("emailNotice")
+      emailNotice: document.getElementById("emailNotice"),
+
+      emailModalBackdrop: document.getElementById("emailModalBackdrop"),
+      modalEmail: document.getElementById("modalEmail"),
+      confirmEmailBtn: document.getElementById("confirmEmailBtn"),
+      cancelEmailBtn: document.getElementById("cancelEmailBtn"),
+      modalEmailError: document.getElementById("modalEmailError")
     };
 
     function trackEvent(name, params = {}) {
@@ -731,22 +795,22 @@
     function getSummaryText(labName, status, symptoms) {
       const symptomText = symptoms ? ` Reported symptoms: ${symptoms}.` : "";
       if (status === "HIGH") {
-        return `Your ${labName} is above the reference range you entered.${symptomText} One abnormal value alone does not diagnose the cause, but it may support a deeper conversation about inflammation, thyroid patterns, nutrient issues, immune activity, or follow-up testing depending on the lab.`;
+        return `Your ${labName} is above the range you entered.${symptomText} One abnormal value alone does not diagnose the cause, but it may support a deeper conversation about inflammation, thyroid patterns, nutrient issues, immune activity, or follow-up testing depending on the lab.`;
       }
       if (status === "LOW") {
-        return `Your ${labName} is below the reference range you entered.${symptomText} This does not diagnose the cause by itself, but it may be important when reviewed alongside symptoms, history, repeat labs, and trend changes over time.`;
+        return `Your ${labName} is below the range you entered.${symptomText} This does not diagnose the cause by itself, but it may be important when reviewed alongside symptoms, history, repeat labs, and trend changes over time.`;
       }
-      return `Your ${labName} is within the reference range you entered.${symptomText} In-range does not always mean nothing is wrong, especially when symptoms and repeat patterns are still present.`;
+      return `Your ${labName} is within the range you entered.${symptomText} In-range does not always mean nothing is wrong, especially when symptoms and repeat patterns are still present.`;
     }
 
     function getDoctorLanguage(labName, result, low, high, status) {
       if (status === "HIGH") {
-        return `<strong>Doctor-language summary:</strong><br>${labName} is elevated at ${result} compared with the provided reference range of ${low} to ${high}. Clinical significance depends on symptoms, timing, repeat trends, and the rest of the patient picture.`;
+        return `<strong>Doctor-language summary:</strong><br>${labName} is elevated at ${result} compared with the provided range of ${low} to ${high}. Clinical significance depends on symptoms, timing, repeat trends, and the rest of the patient picture.`;
       }
       if (status === "LOW") {
-        return `<strong>Doctor-language summary:</strong><br>${labName} is low at ${result} compared with the provided reference range of ${low} to ${high}. Clinical significance depends on symptoms, timing, repeat trends, and the rest of the patient picture.`;
+        return `<strong>Doctor-language summary:</strong><br>${labName} is low at ${result} compared with the provided range of ${low} to ${high}. Clinical significance depends on symptoms, timing, repeat trends, and the rest of the patient picture.`;
       }
-      return `<strong>Doctor-language summary:</strong><br>${labName} is currently within the provided reference range at ${result} (${low} to ${high}), though symptoms and trend history may still justify further discussion or repeat testing.`;
+      return `<strong>Doctor-language summary:</strong><br>${labName} is currently within the provided range at ${result} (${low} to ${high}), though symptoms and trend history may still justify further discussion or repeat testing.`;
     }
 
     function getAdvocacyLanguage(symptoms, context, status) {
@@ -758,6 +822,10 @@
     function symptomIncludes(word) {
       const combined = (state.symptoms + " " + state.context).toLowerCase();
       return combined.includes(word);
+    }
+
+    function dedupeArray(arr) {
+      return [...new Set(arr)];
     }
 
     function buildDoctorQuestions() {
@@ -790,7 +858,6 @@
 
     function buildRelatedLabs() {
       let labs = [];
-
       const labNameLower = state.labName.toLowerCase();
 
       if (labNameLower.includes("crp") || labNameLower.includes("esr")) {
@@ -866,10 +933,6 @@
       return dedupeArray(clues);
     }
 
-    function dedupeArray(arr) {
-      return [...new Set(arr)];
-    }
-
     function renderList(listEl, items) {
       listEl.innerHTML = "";
       items.forEach(item => {
@@ -892,8 +955,8 @@
 
       if (!labName) return showError("Please enter the lab name.");
       if (Number.isNaN(result)) return showError("Please enter your lab result.");
-      if (Number.isNaN(low) || Number.isNaN(high)) return showError("Please enter both reference range values.");
-      if (high <= low) return showError("Reference high must be greater than reference low.");
+      if (Number.isNaN(low) || Number.isNaN(high)) return showError("Please enter both range values.");
+      if (high <= low) return showError("Normal range to must be greater than normal range from.");
 
       const status = getStatus(result, low, high);
       const summaryLine = getSummaryText(labName, status, symptoms);
@@ -950,6 +1013,8 @@
       el.refHigh.value = "";
       el.symptomsText.value = "";
       el.contextText.value = "";
+      el.patientName.value = "";
+      el.patientEmail.value = "";
       document.querySelectorAll(".symptomCheck").forEach(cb => cb.checked = false);
 
       state.labName = "";
@@ -968,6 +1033,7 @@
       state.doctorQuestions = [];
       state.relatedLabs = [];
       state.patternClues = [];
+      state.pendingDownload = false;
 
       el.resultCard.classList.add("hidden");
       el.advocacySection.classList.add("hidden");
@@ -979,6 +1045,7 @@
       el.relatedLabsList.innerHTML = "";
       el.patternCluesList.innerHTML = "";
       hideError();
+      hideEmailModal();
       renderEntries();
       drawTrend();
     }
@@ -1205,7 +1272,7 @@ LAB INFORMATION
 Lab Name: ${state.labName}
 Lab Date: ${state.labDate}
 Result: ${state.result}
-Reference Range: ${state.low} to ${state.high}
+Normal Range: ${state.low} to ${state.high}
 Status: ${state.status}
 
 SUMMARY
@@ -1252,18 +1319,62 @@ This tool is for organization and advocacy support. It does not diagnose disease
       if (el.patientEmail.value.trim()) {
         el.emailNotice.textContent = `Email entered: ${el.patientEmail.value.trim()} — included in the report for record purposes only.`;
       } else {
-        el.emailNotice.textContent = "No email entered. You can still download the PDF.";
+        el.emailNotice.textContent = "Email will be required before the PDF download.";
       }
 
       trackEvent("unl_summary_generated", { lab_name: state.labName });
     }
 
-    function downloadPDF() {
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function showEmailModal() {
+      const existingEmail = el.patientEmail.value.trim() || localStorage.getItem("unl_saved_email") || "";
+      el.modalEmail.value = existingEmail;
+      el.modalEmailError.textContent = "";
+      el.modalEmailError.classList.add("hidden");
+      el.emailModalBackdrop.classList.remove("hidden");
+      setTimeout(() => el.modalEmail.focus(), 50);
+    }
+
+    function hideEmailModal() {
+      el.emailModalBackdrop.classList.add("hidden");
+      el.modalEmailError.textContent = "";
+      el.modalEmailError.classList.add("hidden");
+      state.pendingDownload = false;
+    }
+
+    function requireEmailBeforeDownload() {
       if (!state.labName) {
         alert("Analyze a lab first.");
         return;
       }
 
+      state.pendingDownload = true;
+      showEmailModal();
+    }
+
+    function confirmEmailAndDownload() {
+      const email = el.modalEmail.value.trim();
+
+      if (!isValidEmail(email)) {
+        el.modalEmailError.textContent = "Please enter a valid email address.";
+        el.modalEmailError.classList.remove("hidden");
+        return;
+      }
+
+      el.patientEmail.value = email;
+      localStorage.setItem("unl_saved_email", email);
+      el.emailNotice.textContent = `Email entered: ${email} — included in the report for record purposes only.`;
+      hideEmailModal();
+
+      if (state.pendingDownload || true) {
+        actuallyDownloadPDF();
+      }
+    }
+
+    function actuallyDownloadPDF() {
       const report = buildReport();
       const doc = new jsPDF();
       let y = 16;
@@ -1291,7 +1402,10 @@ This tool is for organization and advocacy support. It does not diagnose disease
       const safeName = (state.labName || "lab").replace(/\s+/g, "_").toLowerCase();
       doc.save(`${safeName}_unl_advocacy_report.pdf`);
 
-      trackEvent("unl_pdf_downloaded", { lab_name: state.labName });
+      trackEvent("unl_pdf_downloaded", {
+        lab_name: state.labName,
+        email_present: !!el.patientEmail.value.trim()
+      });
     }
 
     el.analyzeBtn.addEventListener("click", analyze);
@@ -1302,11 +1416,22 @@ This tool is for organization and advocacy support. It does not diagnose disease
     el.addTrendBtn.addEventListener("click", addTrend);
     el.clearTrendBtn.addEventListener("click", clearTrend);
     el.generateBtn.addEventListener("click", generateSummary);
-    el.downloadBtn.addEventListener("click", downloadPDF);
+    el.downloadBtn.addEventListener("click", requireEmailBeforeDownload);
+
+    el.confirmEmailBtn.addEventListener("click", confirmEmailAndDownload);
+    el.cancelEmailBtn.addEventListener("click", hideEmailModal);
+    el.emailModalBackdrop.addEventListener("click", (e) => {
+      if (e.target === el.emailModalBackdrop) hideEmailModal();
+    });
 
     const today = new Date().toISOString().split("T")[0];
     el.labDate.value = today;
     el.trendDate.value = today;
+
+    const savedEmail = localStorage.getItem("unl_saved_email");
+    if (savedEmail) {
+      el.patientEmail.value = savedEmail;
+    }
 
     renderEntries();
     drawTrend();
