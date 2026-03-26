@@ -6,7 +6,7 @@
   <title>UNL™ Advocacy Analyzer | Unhinged N Loud™</title>
   <meta
     name="description"
-    content="Analyze lab values, connect symptoms, generate doctor questions, review related labs to discuss, track trends, and create a doctor-ready summary."
+    content="Analyze lab values, connect symptoms, view doctor questions, related labs to discuss, pattern clues, and create a doctor-ready summary."
   />
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -462,17 +462,17 @@
     <section class="hero">
       <div class="eyebrow">Unhinged N Loud™</div>
       <h1>UNL™ ADVOCACY ANALYZER</h1>
-      <p class="lead">Labs + symptoms + doctor questions + related labs to discuss + trend tracking + summary report.</p>
+      <p class="lead">Labs + symptoms + doctor questions + related labs + pattern clues + summary report.</p>
       <p class="sub">
-        This version helps users organize their patterns and prepare for better doctor conversations.
+        Users can view the guidance on screen first. Email is only required for the PDF download.
       </p>
     </section>
 
     <section class="panel cyan">
-      <div class="step">Step 1 · Lab + symptom input</div>
-      <h2>Enter Your Information</h2>
+      <div class="step">Step 1 · Enter your information</div>
+      <h2>Analyze One Lab + Your Symptoms</h2>
       <p class="muted">
-        Start with one lab result, add symptoms, and the tool will organize both the lab side and the advocacy side.
+        Fill this out once, then the guidance appears immediately on the page.
       </p>
 
       <div class="grid two">
@@ -557,20 +557,14 @@
 
         <div id="doctorLanguage" class="box"></div>
         <div id="advocacyLanguage" class="box"></div>
-
-        <div class="btn-row">
-          <button class="btn-green" id="openAdvocacyBtn" type="button">View Advocacy Support</button>
-          <button class="btn-dark" id="openTrendBtn" type="button">Track This Lab Over Time</button>
-          <button class="btn-primary" id="openReportBtn" type="button">Create Doctor Summary</button>
-        </div>
       </div>
     </section>
 
     <section class="panel green hidden" id="advocacySection">
-      <div class="step">Step 2 · Advocacy support</div>
+      <div class="step">Step 2 · View guidance now</div>
       <h2>Questions, Related Labs, and Pattern Clues</h2>
       <p class="muted">
-        This section helps users organize what to ask, what to discuss, and how to describe what they are noticing.
+        This appears immediately after analysis so users can read it right away without entering email.
       </p>
 
       <div class="adv-grid">
@@ -591,10 +585,40 @@
       </div>
     </section>
 
+    <section class="panel pink hidden" id="summarySection">
+      <div class="step">Step 3 · View summary on screen</div>
+      <h2>Doctor Summary Preview</h2>
+      <p class="muted">
+        Users can read and review this on screen first. No email required to view it.
+      </p>
+
+      <div class="grid two">
+        <div>
+          <label for="patientName">Your Name</label>
+          <input id="patientName" type="text" placeholder="Your name" />
+        </div>
+        <div>
+          <label for="patientEmail">Email</label>
+          <input id="patientEmail" type="email" placeholder="you@example.com" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-dark" id="refreshSummaryBtn" type="button">Refresh Summary Preview</button>
+        <button class="btn-green" id="downloadBtn" type="button">Download Doctor Summary PDF</button>
+      </div>
+
+      <div class="tiny" id="emailNotice">
+        Users can view the summary without email. Email is only required when downloading the PDF.
+      </div>
+
+      <div id="reportPreview" class="report-preview"></div>
+    </section>
+
     <section class="panel green hidden" id="trendSection">
-      <div class="step">Step 3 · Optional trend tracking</div>
+      <div class="step">Optional · Track trend</div>
       <h2>Track This Lab Over Time</h2>
-      <p class="muted">Add more entries to visualize whether this lab is moving up, down, or staying unstable.</p>
+      <p class="muted">This is optional. It should not block people from seeing their questions or summary.</p>
 
       <div class="grid three">
         <div>
@@ -621,39 +645,12 @@
         <button class="btn-dark" id="clearTrendBtn" type="button">Clear Trend Data</button>
       </div>
     </section>
-
-    <section class="panel pink hidden" id="reportSection">
-      <div class="step">Step 4 · Doctor-ready summary</div>
-      <h2>Generate Your Report</h2>
-      <p class="muted">Preview the summary, then download the PDF.</p>
-
-      <div class="grid two">
-        <div>
-          <label for="patientName">Your Name</label>
-          <input id="patientName" type="text" placeholder="Your name" />
-        </div>
-        <div>
-          <label for="patientEmail">Email</label>
-          <input id="patientEmail" type="email" placeholder="you@example.com" />
-        </div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-primary" id="generateBtn" type="button">Generate Summary</button>
-        <button class="btn-green" id="downloadBtn" type="button">Download Doctor Summary PDF</button>
-      </div>
-
-      <div class="tiny" id="emailNotice">Email is required before the PDF download. This version does not send email automatically.</div>
-
-      <div id="reportPreview" class="report-preview hidden"></div>
-    </section>
   </div>
 
-  <!-- EMAIL MODAL -->
   <div id="emailModalBackdrop" class="modal-backdrop hidden">
     <div class="modal">
-      <h3>Get Your Report</h3>
-      <p>Enter your email before downloading your doctor summary PDF.</p>
+      <h3>Enter Email To Download</h3>
+      <p>This is only required for the PDF download. The on-screen guidance is already available without it.</p>
 
       <label for="modalEmail">Email Address</label>
       <input id="modalEmail" type="email" placeholder="you@example.com" />
@@ -686,8 +683,7 @@
       trendEntries: [],
       doctorQuestions: [],
       relatedLabs: [],
-      patternClues: [],
-      pendingDownload: false
+      patternClues: []
     };
 
     const el = {
@@ -711,14 +707,19 @@
       statStatus: document.getElementById("statStatus"),
       doctorLanguage: document.getElementById("doctorLanguage"),
       advocacyLanguage: document.getElementById("advocacyLanguage"),
-      openAdvocacyBtn: document.getElementById("openAdvocacyBtn"),
-      openTrendBtn: document.getElementById("openTrendBtn"),
-      openReportBtn: document.getElementById("openReportBtn"),
 
       advocacySection: document.getElementById("advocacySection"),
       doctorQuestionsList: document.getElementById("doctorQuestionsList"),
       relatedLabsList: document.getElementById("relatedLabsList"),
       patternCluesList: document.getElementById("patternCluesList"),
+
+      summarySection: document.getElementById("summarySection"),
+      patientName: document.getElementById("patientName"),
+      patientEmail: document.getElementById("patientEmail"),
+      refreshSummaryBtn: document.getElementById("refreshSummaryBtn"),
+      downloadBtn: document.getElementById("downloadBtn"),
+      reportPreview: document.getElementById("reportPreview"),
+      emailNotice: document.getElementById("emailNotice"),
 
       trendSection: document.getElementById("trendSection"),
       trendDate: document.getElementById("trendDate"),
@@ -727,14 +728,6 @@
       clearTrendBtn: document.getElementById("clearTrendBtn"),
       trendCanvas: document.getElementById("trendCanvas"),
       entryList: document.getElementById("entryList"),
-
-      reportSection: document.getElementById("reportSection"),
-      patientName: document.getElementById("patientName"),
-      patientEmail: document.getElementById("patientEmail"),
-      generateBtn: document.getElementById("generateBtn"),
-      downloadBtn: document.getElementById("downloadBtn"),
-      reportPreview: document.getElementById("reportPreview"),
-      emailNotice: document.getElementById("emailNotice"),
 
       emailModalBackdrop: document.getElementById("emailModalBackdrop"),
       modalEmail: document.getElementById("modalEmail"),
@@ -942,158 +935,67 @@
       });
     }
 
-    function analyze() {
-      hideError();
-
-      const labName = el.labName.value.trim();
-      const labDate = el.labDate.value || new Date().toISOString().split("T")[0];
-      const result = toNum(el.labResult.value);
-      const low = toNum(el.refLow.value);
-      const high = toNum(el.refHigh.value);
-      const symptoms = mergeSymptoms();
-      const context = el.contextText.value.trim();
-
-      if (!labName) return showError("Please enter the lab name.");
-      if (Number.isNaN(result)) return showError("Please enter your lab result.");
-      if (Number.isNaN(low) || Number.isNaN(high)) return showError("Please enter both range values.");
-      if (high <= low) return showError("Normal range to must be greater than normal range from.");
-
-      const status = getStatus(result, low, high);
-      const summaryLine = getSummaryText(labName, status, symptoms);
-      const doctorLine = getDoctorLanguage(labName, result, low, high, status);
-      const advocacyLine = getAdvocacyLanguage(symptoms, context, status);
-
-      state.labName = labName;
-      state.labDate = labDate;
-      state.result = result;
-      state.low = low;
-      state.high = high;
-      state.status = status;
-      state.symptoms = symptoms;
-      state.context = context;
-      state.quickSymptoms = getCheckedSymptoms();
-      state.summaryLine = summaryLine;
-      state.doctorLine = doctorLine;
-      state.advocacyLine = advocacyLine;
-      state.doctorQuestions = buildDoctorQuestions();
-      state.relatedLabs = buildRelatedLabs();
-      state.patternClues = buildPatternClues();
-
-      el.resultCard.classList.remove("hidden");
-      el.statusPill.className = "status-pill " + statusClass(status);
-      el.statusPill.textContent = status;
-      el.resultTitle.textContent = `${labName} is ${status}`;
-      el.resultSummary.textContent = summaryLine;
-      el.statLab.textContent = labName;
-      el.statResult.textContent = result;
-      el.statRange.textContent = `${low} – ${high}`;
-      el.statStatus.textContent = status;
-      el.doctorLanguage.innerHTML = doctorLine;
-      el.advocacyLanguage.innerHTML = advocacyLine;
-
-      renderList(el.doctorQuestionsList, state.doctorQuestions);
-      renderList(el.relatedLabsList, state.relatedLabs);
-      renderList(el.patternCluesList, state.patternClues);
-
-      if (state.trendEntries.length === 0) {
-        state.trendEntries.push({ date: labDate, value: result });
-      }
-
-      renderEntries();
-      drawTrend();
-
-      trackEvent("unl_advocacy_analyzed", { lab_name: labName, status });
+    function stripHtml(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      return div.textContent || div.innerText || "";
     }
 
-    function clearAll() {
-      el.labName.value = "";
-      el.labDate.value = new Date().toISOString().split("T")[0];
-      el.labResult.value = "";
-      el.refLow.value = "";
-      el.refHigh.value = "";
-      el.symptomsText.value = "";
-      el.contextText.value = "";
-      el.patientName.value = "";
-      el.patientEmail.value = "";
-      document.querySelectorAll(".symptomCheck").forEach(cb => cb.checked = false);
+    function buildReport() {
+      const patientName = el.patientName.value.trim() || "Patient";
+      const patientEmail = el.patientEmail.value.trim() || "Not entered";
+      const trendText = state.trendEntries.length
+        ? state.trendEntries.map(e => `${e.date}: ${e.value}`).join("\n")
+        : "No trend entries recorded.";
 
-      state.labName = "";
-      state.labDate = "";
-      state.result = null;
-      state.low = null;
-      state.high = null;
-      state.status = "";
-      state.symptoms = "";
-      state.context = "";
-      state.quickSymptoms = [];
-      state.summaryLine = "";
-      state.doctorLine = "";
-      state.advocacyLine = "";
-      state.trendEntries = [];
-      state.doctorQuestions = [];
-      state.relatedLabs = [];
-      state.patternClues = [];
-      state.pendingDownload = false;
+      return `UNL™ ADVOCACY ANALYZER
+Powered by Unhinged N Loud™
 
-      el.resultCard.classList.add("hidden");
-      el.advocacySection.classList.add("hidden");
-      el.trendSection.classList.add("hidden");
-      el.reportSection.classList.add("hidden");
-      el.reportPreview.classList.add("hidden");
-      el.reportPreview.textContent = "";
-      el.doctorQuestionsList.innerHTML = "";
-      el.relatedLabsList.innerHTML = "";
-      el.patternCluesList.innerHTML = "";
-      hideError();
-      hideEmailModal();
-      renderEntries();
-      drawTrend();
+Patient Name: ${patientName}
+Email: ${patientEmail}
+Report Date: ${new Date().toLocaleDateString()}
+
+LAB INFORMATION
+Lab Name: ${state.labName}
+Lab Date: ${state.labDate}
+Result: ${state.result}
+Normal Range: ${state.low} to ${state.high}
+Status: ${state.status}
+
+SUMMARY
+${state.summaryLine}
+
+DOCTOR-LANGUAGE SUMMARY
+${stripHtml(state.doctorLine)}
+
+ADVOCACY NOTE
+${stripHtml(state.advocacyLine)}
+
+QUESTIONS TO ASK YOUR DOCTOR
+${state.doctorQuestions.map(q => "- " + q).join("\n")}
+
+RELATED LABS TO DISCUSS
+${state.relatedLabs.map(l => "- " + l).join("\n")}
+
+PATTERN CLUES
+${state.patternClues.map(c => "- " + c).join("\n")}
+
+SYMPTOMS
+${state.symptoms || "None entered"}
+
+PATTERN / CONTEXT NOTES
+${state.context || "None entered"}
+
+TREND ENTRIES
+${trendText}
+
+EDUCATIONAL NOTE
+This tool is for organization and advocacy support. It does not diagnose disease, recommend treatment, or replace medical care.`;
     }
 
-    function openAdvocacy() {
-      if (!state.labName) return showError("Analyze a lab first.");
-      el.advocacySection.classList.remove("hidden");
-      el.advocacySection.scrollIntoView({ behavior: "smooth", block: "start" });
-      trackEvent("unl_advocacy_opened", { lab_name: state.labName });
-    }
-
-    function openTrend() {
-      if (!state.labName) return showError("Analyze a lab first.");
-      el.trendSection.classList.remove("hidden");
-      el.trendDate.value = new Date().toISOString().split("T")[0];
-      el.trendValue.value = "";
-      el.trendSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      trackEvent("unl_trend_opened", { lab_name: state.labName });
-    }
-
-    function openReport() {
-      if (!state.labName) return showError("Analyze a lab first.");
-      el.reportSection.classList.remove("hidden");
-      el.reportSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      trackEvent("unl_report_opened", { lab_name: state.labName });
-    }
-
-    function addTrend() {
-      const date = el.trendDate.value;
-      const value = toNum(el.trendValue.value);
-
-      if (!date) return alert("Please choose a date.");
-      if (Number.isNaN(value)) return alert("Please enter a lab value.");
-
-      state.trendEntries.push({ date, value });
-      state.trendEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-      el.trendValue.value = "";
-      renderEntries();
-      drawTrend();
-      trackEvent("unl_trend_added", { lab_name: state.labName });
-    }
-
-    function clearTrend() {
-      state.trendEntries = state.labName ? [{ date: state.labDate, value: state.result }] : [];
-      renderEntries();
-      drawTrend();
-      trackEvent("unl_trend_cleared", { lab_name: state.labName || "none" });
+    function updateSummaryPreview() {
+      if (!state.labName) return;
+      el.reportPreview.textContent = buildReport();
     }
 
     function renderEntries() {
@@ -1122,6 +1024,7 @@
           state.trendEntries.splice(i, 1);
           renderEntries();
           drawTrend();
+          updateSummaryPreview();
         });
       });
     }
@@ -1248,81 +1151,144 @@
       });
     }
 
-    function stripHtml(html) {
-      const div = document.createElement("div");
-      div.innerHTML = html;
-      return div.textContent || div.innerText || "";
-    }
+    function analyze() {
+      hideError();
 
-    function buildReport() {
-      const patientName = el.patientName.value.trim() || "Patient";
-      const patientEmail = el.patientEmail.value.trim() || "Not entered";
-      const trendText = state.trendEntries.length
-        ? state.trendEntries.map(e => `${e.date}: ${e.value}`).join("\n")
-        : "No trend entries recorded.";
+      const labName = el.labName.value.trim();
+      const labDate = el.labDate.value || new Date().toISOString().split("T")[0];
+      const result = toNum(el.labResult.value);
+      const low = toNum(el.refLow.value);
+      const high = toNum(el.refHigh.value);
+      const symptoms = mergeSymptoms();
+      const context = el.contextText.value.trim();
 
-      return `UNL™ ADVOCACY ANALYZER
-Powered by Unhinged N Loud™
+      if (!labName) return showError("Please enter the lab name.");
+      if (Number.isNaN(result)) return showError("Please enter your lab result.");
+      if (Number.isNaN(low) || Number.isNaN(high)) return showError("Please enter both range values.");
+      if (high <= low) return showError("Normal range to must be greater than normal range from.");
 
-Patient Name: ${patientName}
-Email: ${patientEmail}
-Report Date: ${new Date().toLocaleDateString()}
+      const status = getStatus(result, low, high);
+      const summaryLine = getSummaryText(labName, status, symptoms);
+      const doctorLine = getDoctorLanguage(labName, result, low, high, status);
+      const advocacyLine = getAdvocacyLanguage(symptoms, context, status);
 
-LAB INFORMATION
-Lab Name: ${state.labName}
-Lab Date: ${state.labDate}
-Result: ${state.result}
-Normal Range: ${state.low} to ${state.high}
-Status: ${state.status}
+      state.labName = labName;
+      state.labDate = labDate;
+      state.result = result;
+      state.low = low;
+      state.high = high;
+      state.status = status;
+      state.symptoms = symptoms;
+      state.context = context;
+      state.quickSymptoms = getCheckedSymptoms();
+      state.summaryLine = summaryLine;
+      state.doctorLine = doctorLine;
+      state.advocacyLine = advocacyLine;
+      state.doctorQuestions = buildDoctorQuestions();
+      state.relatedLabs = buildRelatedLabs();
+      state.patternClues = buildPatternClues();
 
-SUMMARY
-${state.summaryLine}
+      el.resultCard.classList.remove("hidden");
+      el.advocacySection.classList.remove("hidden");
+      el.summarySection.classList.remove("hidden");
+      el.trendSection.classList.remove("hidden");
 
-DOCTOR-LANGUAGE SUMMARY
-${stripHtml(state.doctorLine)}
+      el.statusPill.className = "status-pill " + statusClass(status);
+      el.statusPill.textContent = status;
+      el.resultTitle.textContent = `${labName} is ${status}`;
+      el.resultSummary.textContent = summaryLine;
+      el.statLab.textContent = labName;
+      el.statResult.textContent = result;
+      el.statRange.textContent = `${low} – ${high}`;
+      el.statStatus.textContent = status;
+      el.doctorLanguage.innerHTML = doctorLine;
+      el.advocacyLanguage.innerHTML = advocacyLine;
 
-ADVOCACY NOTE
-${stripHtml(state.advocacyLine)}
+      renderList(el.doctorQuestionsList, state.doctorQuestions);
+      renderList(el.relatedLabsList, state.relatedLabs);
+      renderList(el.patternCluesList, state.patternClues);
 
-QUESTIONS TO ASK YOUR DOCTOR
-${state.doctorQuestions.map(q => "- " + q).join("\n")}
-
-RELATED LABS TO DISCUSS
-${state.relatedLabs.map(l => "- " + l).join("\n")}
-
-PATTERN CLUES
-${state.patternClues.map(c => "- " + c).join("\n")}
-
-SYMPTOMS
-${state.symptoms || "None entered"}
-
-PATTERN / CONTEXT NOTES
-${state.context || "None entered"}
-
-TREND ENTRIES
-${trendText}
-
-EDUCATIONAL NOTE
-This tool is for organization and advocacy support. It does not diagnose disease, recommend treatment, or replace medical care.`;
-    }
-
-    function generateSummary() {
-      if (!state.labName) {
-        alert("Analyze a lab first.");
-        return;
+      if (state.trendEntries.length === 0) {
+        state.trendEntries.push({ date: labDate, value: result });
       }
 
-      const report = buildReport();
-      el.reportPreview.textContent = report;
-      el.reportPreview.classList.remove("hidden");
+      renderEntries();
+      drawTrend();
+      updateSummaryPreview();
 
-      if (el.patientEmail.value.trim()) {
-        el.emailNotice.textContent = `Email entered: ${el.patientEmail.value.trim()} — included in the report for record purposes only.`;
-      } else {
-        el.emailNotice.textContent = "Email will be required before the PDF download.";
-      }
+      setTimeout(() => {
+        el.resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
 
-      trackEvent("unl_summary_generated", { lab_name: state.labName });
+      trackEvent("unl_advocacy_analyzed", { lab_name: labName, status });
+    }
+
+    function addTrend() {
+      const date = el.trendDate.value;
+      const value = toNum(el.trendValue.value);
+
+      if (!date) return alert("Please choose a date.");
+      if (Number.isNaN(value)) return alert("Please enter a lab value.");
+
+      state.trendEntries.push({ date, value });
+      state.trendEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      el.trendValue.value = "";
+      renderEntries();
+      drawTrend();
+      updateSummaryPreview();
+      trackEvent("unl_trend_added", { lab_name: state.labName });
+    }
+
+    function clearTrend() {
+      state.trendEntries = state.labName ? [{ date: state.labDate, value: state.result }] : [];
+      renderEntries();
+      drawTrend();
+      updateSummaryPreview();
+      trackEvent("unl_trend_cleared", { lab_name: state.labName || "none" });
+    }
+
+    function clearAll() {
+      el.labName.value = "";
+      el.labDate.value = new Date().toISOString().split("T")[0];
+      el.labResult.value = "";
+      el.refLow.value = "";
+      el.refHigh.value = "";
+      el.symptomsText.value = "";
+      el.contextText.value = "";
+      el.patientName.value = "";
+      el.patientEmail.value = "";
+      document.querySelectorAll(".symptomCheck").forEach(cb => cb.checked = false);
+
+      state.labName = "";
+      state.labDate = "";
+      state.result = null;
+      state.low = null;
+      state.high = null;
+      state.status = "";
+      state.symptoms = "";
+      state.context = "";
+      state.quickSymptoms = [];
+      state.summaryLine = "";
+      state.doctorLine = "";
+      state.advocacyLine = "";
+      state.trendEntries = [];
+      state.doctorQuestions = [];
+      state.relatedLabs = [];
+      state.patternClues = [];
+
+      el.resultCard.classList.add("hidden");
+      el.advocacySection.classList.add("hidden");
+      el.summarySection.classList.add("hidden");
+      el.trendSection.classList.add("hidden");
+      el.doctorQuestionsList.innerHTML = "";
+      el.relatedLabsList.innerHTML = "";
+      el.patternCluesList.innerHTML = "";
+      el.reportPreview.textContent = "";
+      hideError();
+      hideEmailModal();
+      renderEntries();
+      drawTrend();
     }
 
     function isValidEmail(email) {
@@ -1342,7 +1308,6 @@ This tool is for organization and advocacy support. It does not diagnose disease
       el.emailModalBackdrop.classList.add("hidden");
       el.modalEmailError.textContent = "";
       el.modalEmailError.classList.add("hidden");
-      state.pendingDownload = false;
     }
 
     function requireEmailBeforeDownload() {
@@ -1350,28 +1315,7 @@ This tool is for organization and advocacy support. It does not diagnose disease
         alert("Analyze a lab first.");
         return;
       }
-
-      state.pendingDownload = true;
       showEmailModal();
-    }
-
-    function confirmEmailAndDownload() {
-      const email = el.modalEmail.value.trim();
-
-      if (!isValidEmail(email)) {
-        el.modalEmailError.textContent = "Please enter a valid email address.";
-        el.modalEmailError.classList.remove("hidden");
-        return;
-      }
-
-      el.patientEmail.value = email;
-      localStorage.setItem("unl_saved_email", email);
-      el.emailNotice.textContent = `Email entered: ${email} — included in the report for record purposes only.`;
-      hideEmailModal();
-
-      if (state.pendingDownload || true) {
-        actuallyDownloadPDF();
-      }
     }
 
     function actuallyDownloadPDF() {
@@ -1408,21 +1352,38 @@ This tool is for organization and advocacy support. It does not diagnose disease
       });
     }
 
+    function confirmEmailAndDownload() {
+      const email = el.modalEmail.value.trim();
+
+      if (!isValidEmail(email)) {
+        el.modalEmailError.textContent = "Please enter a valid email address.";
+        el.modalEmailError.classList.remove("hidden");
+        return;
+      }
+
+      el.patientEmail.value = email;
+      localStorage.setItem("unl_saved_email", email);
+      el.emailNotice.textContent = `Email entered: ${email} — included in the PDF report.`;
+      hideEmailModal();
+      updateSummaryPreview();
+      actuallyDownloadPDF();
+    }
+
     el.analyzeBtn.addEventListener("click", analyze);
     el.clearBtn.addEventListener("click", clearAll);
-    el.openAdvocacyBtn.addEventListener("click", openAdvocacy);
-    el.openTrendBtn.addEventListener("click", openTrend);
-    el.openReportBtn.addEventListener("click", openReport);
+    el.refreshSummaryBtn.addEventListener("click", updateSummaryPreview);
+    el.downloadBtn.addEventListener("click", requireEmailBeforeDownload);
     el.addTrendBtn.addEventListener("click", addTrend);
     el.clearTrendBtn.addEventListener("click", clearTrend);
-    el.generateBtn.addEventListener("click", generateSummary);
-    el.downloadBtn.addEventListener("click", requireEmailBeforeDownload);
 
     el.confirmEmailBtn.addEventListener("click", confirmEmailAndDownload);
     el.cancelEmailBtn.addEventListener("click", hideEmailModal);
     el.emailModalBackdrop.addEventListener("click", (e) => {
       if (e.target === el.emailModalBackdrop) hideEmailModal();
     });
+
+    el.patientName.addEventListener("input", updateSummaryPreview);
+    el.patientEmail.addEventListener("input", updateSummaryPreview);
 
     const today = new Date().toISOString().split("T")[0];
     el.labDate.value = today;
